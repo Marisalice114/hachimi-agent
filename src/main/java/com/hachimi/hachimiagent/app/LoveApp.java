@@ -2,6 +2,7 @@ package com.hachimi.hachimiagent.app;
 
 import com.hachimi.hachimiagent.advisor.ReReadingAdvisor;
 import com.hachimi.hachimiagent.advisor.SelfLogAdvisor;
+import com.hachimi.hachimiagent.chatmemory.FileBasedChatMemoryRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
@@ -13,6 +14,7 @@ import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.stereotype.Component;
 
+import java.io.File;
 import java.util.List;
 
 import static org.springframework.ai.vectorstore.SearchRequest.DEFAULT_TOP_K;
@@ -37,10 +39,17 @@ public class LoveApp {
                 .maxMessages(5)
                 .build();
 
+        // 初始化基于文件的对话记忆
+        ChatMemoryRepository fileRepository = new FileBasedChatMemoryRepository("./tmp/chat_memory");
+        ChatMemory fileChatMemory = MessageWindowChatMemory.builder()
+                .chatMemoryRepository(fileRepository)
+                .maxMessages(5)
+                .build();
+
         // 创建配置好的 chatClient 并赋值给字段
         this.chatClient = ChatClient.builder(dashscopeChatModel)
                 .defaultSystem(SYSTEM_PROMPT)
-                .defaultAdvisors(MessageChatMemoryAdvisor.builder(chatMemory).build(),
+                .defaultAdvisors(MessageChatMemoryAdvisor.builder(fileChatMemory).build(),
                         new SelfLogAdvisor()
 //                        new ReReadingAdvisor()
                         ).build();
@@ -68,7 +77,7 @@ public class LoveApp {
         }
 
         String chatResult = chatResponse.getResult().getOutput().getText();
-        log.info("Chat result: {}", chatResult);
+//        log.info("Chat result: {}", chatResult);
         return chatResult;
     }
 
