@@ -21,6 +21,13 @@ spring:
       test-on-return: false
       pool-prepared-statements: true
       max-pool-prepared-statement-per-connection-size: 20
+  ai:
+    ollama:
+      base-url: http://localhost:11434
+      chat:
+        model: qwen3:0.6b
+      embedding:
+        model: nomic-embed-text:latest
 
 # MyBatis-Plus 配置
 mybatis-plus:

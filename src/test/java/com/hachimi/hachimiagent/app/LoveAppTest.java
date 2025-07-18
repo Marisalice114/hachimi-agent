@@ -131,4 +131,13 @@ class LoveAppTest {
         assertTrue(messages.size() >= 2, "应该至少有2条消息（用户消息和AI回复）");
         assertEquals(messages.size(), memoryMessages.size(), "两种查询方式的结果应该一致");
     }
+
+    @Test
+    void doChatWithRAG(){
+        String chatId = UUID.randomUUID().toString();
+        //第一轮
+        String userMessage = "我已经结婚了，但是婚后关系不太亲密，我该如何妥善解决";
+        String result = loveApp.doChatWithRAG(userMessage, chatId);
+        System.out.println(result);
+    }
 }
