@@ -38,7 +38,7 @@ class LoveAppTest {
     private MysqlBasedChatMemoryRepository mysqlBasedChatMemoryRepository;
 
     @Test
-    @Rollback(false)  // 🔥 加这个注解
+    @Rollback(false)
     void doChatTest() {
         String chatId = UUID.randomUUID().toString();
         System.out.println("Test Chat ID: " + chatId);
@@ -138,6 +138,15 @@ class LoveAppTest {
         //第一轮
         String userMessage = "我已经结婚了，但是婚后关系不太亲密，我该如何妥善解决";
         String result = loveApp.doChatWithRAG(userMessage, chatId);
+        System.out.println(result);
+    }
+
+    @Test
+    void doChatWithCloudRAG(){
+        String chatId = UUID.randomUUID().toString();
+        //第一轮
+        String userMessage = "我已经结婚了，但是婚后关系不太亲密，我该如何妥善解决";
+        String result = loveApp.doChatWithCloudRAG(userMessage, chatId);
         System.out.println(result);
     }
 }

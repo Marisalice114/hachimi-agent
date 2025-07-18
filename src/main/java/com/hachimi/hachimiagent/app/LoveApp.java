@@ -1,4 +1,3 @@
-
 package com.hachimi.hachimiagent.app;
 
 import com.hachimi.hachimiagent.advisor.SelfLogAdvisor;
@@ -6,12 +5,14 @@ import com.hachimi.hachimiagent.chatmemory.MysqlBasedChatMemoryRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
+import org.springframework.ai.chat.client.advisor.api.Advisor;
 import org.springframework.ai.chat.client.advisor.vectorstore.QuestionAnswerAdvisor;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.memory.MessageWindowChatMemory;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.vectorstore.VectorStore;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -20,11 +21,10 @@ import java.util.List;
 @Slf4j
 public class LoveApp {
 
-    // 普通对话专用客户端
+    // 客户端和所有依赖都声明为 final
     private final ChatClient normalChatClient;
-    // RAG对话专用客户端  
     private final ChatClient ragChatClient;
-    private final MysqlBasedChatMemoryRepository mysqlBasedChatMemoryRepository;
+    private final ChatClient cloudRagClient;
     private final ChatMemory dbChatMemory;
     private final SelfLogAdvisor selfLogAdvisor;
 
@@ -33,57 +33,53 @@ public class LoveApp {
             "恋爱状态询问沟通、习惯差异引发的矛盾；已婚状态询问家庭责任与亲属关系处理的问题。" +
             "引导用户详述事情经过、对方反应及自身想法，以便给出专属解决方案。";
 
-    private static final String MULTIMODAL_SYSTEM_PROMPT = SYSTEM_PROMPT +
-            "\n\n作为恋爱心理专家，我还能够分析图片内容，帮助你理解照片中的情感表达、身体语言、场景氛围等，" +
-            "并结合这些视觉信息给出更准确的恋爱建议。请详细描述你看到的内容，并分析其中的情感信息。";
-
-    // 通过构造函数注入所有依赖，包括VectorStore
+    /**
+     * 使用构造函数注入所有依赖。
+     * Spring 在调用此构造函数之前，会确保所有参数（Bean）都已创建完毕。
+     * @param dashscopeChatModel 核心聊天模型
+     * @param mysqlBasedChatMemoryRepository 数据库聊天记录仓库
+     * @param loveAppVectorStore 本地向量存储
+     * @param loveAppRagCloudAdvisor 阿里云知识库顾问 (使用 @Qualifier 精确指定Bean名称)
+     */
     public LoveApp(ChatModel dashscopeChatModel,
                    MysqlBasedChatMemoryRepository mysqlBasedChatMemoryRepository,
-                   VectorStore loveAppVectorStore) {
-        this.mysqlBasedChatMemoryRepository = mysqlBasedChatMemoryRepository;
+                   VectorStore loveAppVectorStore,
+                   @Qualifier("loveAppRagCloudAdvisor") Advisor loveAppRagCloudAdvisor) {
 
-//        // 使用内存聊天内存作为默认的聊天内存
-//        ChatMemoryRepository repository = new InMemoryChatMemoryRepository();
-//        ChatMemory chatMemory = MessageWindowChatMemory.builder()
-//                .chatMemoryRepository(repository)
-//                .maxMessages(10)  // 增加窗口大小，减少频繁保存
-//                .build();
-
-//        // 使用文件聊天内存作为默认的聊天内存
-//        ChatMemoryRepository fileRepository = new FileBasedChatMemoryRepository();
-//        ChatMemory fileChatMemory = MessageWindowChatMemory.builder()
-//                .chatMemoryRepository(fileRepository)
-//                .maxMessages(10)  // 增加窗口大小，减少频繁保存
-//                .build();
-
-        // 使用注入的 MysqlBasedChatMemoryRepository 实例
+        // 1. 初始化内部组件
         this.dbChatMemory = MessageWindowChatMemory.builder()
                 .chatMemoryRepository(mysqlBasedChatMemoryRepository)
                 .maxMessages(20)
                 .build();
-
         this.selfLogAdvisor = new SelfLogAdvisor();
 
-        // 创建普通对话专用的 chatClient
+        // 2. 初始化所有 ChatClient
+        // 在构造函数内部，所有注入的依赖都是可用的
         this.normalChatClient = ChatClient.builder(dashscopeChatModel)
                 .defaultSystem(SYSTEM_PROMPT)
                 .defaultAdvisors(
                         MessageChatMemoryAdvisor.builder(dbChatMemory).build(),
                         selfLogAdvisor
-//                    new ReReadingAdvisor()
                 ).build();
 
-        // 创建RAG对话专用的 chatClient，预配置所有RAG相关的advisors
         this.ragChatClient = ChatClient.builder(dashscopeChatModel)
                 .defaultSystem(SYSTEM_PROMPT)
                 .defaultAdvisors(
-                        QuestionAnswerAdvisor.builder(loveAppVectorStore).build(),  // RAG功能
-                        MessageChatMemoryAdvisor.builder(dbChatMemory).build(),     // 会话记忆保存
-                        selfLogAdvisor                                              // 自定义日志
+                        QuestionAnswerAdvisor.builder(loveAppVectorStore).build(),
+                        MessageChatMemoryAdvisor.builder(dbChatMemory).build(),
+                        selfLogAdvisor
+                ).build();
+
+        this.cloudRagClient = ChatClient.builder(dashscopeChatModel)
+                .defaultSystem(SYSTEM_PROMPT)
+                .defaultAdvisors(
+                        loveAppRagCloudAdvisor,
+                        MessageChatMemoryAdvisor.builder(dbChatMemory).build(),
+                        selfLogAdvisor
                 ).build();
     }
 
+    // ... (doChat, doChatWithRAG 等其他方法保持不变)
     /**
      * 支持多轮对话
      * @param userMessage 用户输入的消息
@@ -166,5 +162,26 @@ public class LoveApp {
 
         log.info("ragAnswer: {}", result);
         return result;
+    }
+
+    //基于百炼平台云知识库的rag调用
+    public String doChatWithCloudRAG(String message, String chatId) {
+        // 使用预配置的RAG专用客户端，所有advisors已经配置好
+        ChatResponse chatResponse = cloudRagClient.prompt()
+                .user(message)
+                //告诉 MessageChatMemoryAdvisor 使用哪个对话ID来存取历史记录
+                .advisors(a -> a.param(ChatMemory.CONVERSATION_ID, chatId))
+                .call()
+                .chatResponse();
+
+        // 添加空值检查
+        if (chatResponse == null || chatResponse.getResult() == null) {
+            log.error("Cloud RAG Chat response is null for chatId: {}", chatId);
+            return "抱歉，系统暂时无法回复，请稍后再试。";
+        }
+
+        String chatResult = chatResponse.getResult().getOutput().getText();
+        log.info("cloudRagAnswer: {}", chatResult);
+        return chatResult;
     }
 }
