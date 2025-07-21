@@ -8,6 +8,7 @@ import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
 import org.springframework.ai.chat.client.advisor.api.Advisor;
 import org.springframework.ai.chat.client.advisor.vectorstore.QuestionAnswerAdvisor;
 import org.springframework.ai.chat.memory.ChatMemory;
+import org.springframework.ai.chat.memory.InMemoryChatMemoryRepository;
 import org.springframework.ai.chat.memory.MessageWindowChatMemory;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
@@ -27,6 +28,7 @@ public class LoveApp {
     private final ChatClient cloudRagClient;
     private final ChatMemory dbChatMemory;
     private final SelfLogAdvisor selfLogAdvisor;
+    private final ChatMemory baseChatMemory;
 
     private static final String SYSTEM_PROMPT = "扮演深耕恋爱心理领域的专家。开场向用户表明身份，告知用户可倾诉恋爱难题。" +
             "围绕单身、恋爱、已婚三种状态提问：单身状态询问社交圈拓展及追求心仪对象的困扰；" +
@@ -44,6 +46,7 @@ public class LoveApp {
     public LoveApp(ChatModel dashscopeChatModel,
                    MysqlBasedChatMemoryRepository mysqlBasedChatMemoryRepository,
                    VectorStore loveAppVectorStore,
+                   VectorStore pgVectorVectorStore,
                    @Qualifier("loveAppRagCloudAdvisor") Advisor loveAppRagCloudAdvisor) {
 
         // 1. 初始化内部组件
@@ -52,6 +55,12 @@ public class LoveApp {
                 .maxMessages(20)
                 .build();
         this.selfLogAdvisor = new SelfLogAdvisor();
+
+        InMemoryChatMemoryRepository chatMemoryRepository = new InMemoryChatMemoryRepository();
+        this.baseChatMemory = MessageWindowChatMemory.builder()
+                .chatMemoryRepository(chatMemoryRepository)
+                .maxMessages(20)
+                .build();
 
         // 2. 初始化所有 ChatClient
         // 在构造函数内部，所有注入的依赖都是可用的
@@ -65,8 +74,11 @@ public class LoveApp {
         this.ragChatClient = ChatClient.builder(dashscopeChatModel)
                 .defaultSystem(SYSTEM_PROMPT)
                 .defaultAdvisors(
-                        QuestionAnswerAdvisor.builder(loveAppVectorStore).build(),
-                        MessageChatMemoryAdvisor.builder(dbChatMemory).build(),
+//                        //基于内存存储的向量存储
+//                        QuestionAnswerAdvisor.builder(loveAppVectorStore).build(),
+                        //基于pgVector的向量存储
+                        QuestionAnswerAdvisor.builder(pgVectorVectorStore).build(),
+//                        MessageChatMemoryAdvisor.builder(dbChatMemory).build(),
                         selfLogAdvisor
                 ).build();
 
