@@ -78,7 +78,7 @@ public class LoveApp {
 //                        QuestionAnswerAdvisor.builder(loveAppVectorStore).build(),
                         //基于pgVector的向量存储
                         QuestionAnswerAdvisor.builder(pgVectorVectorStore).build(),
-//                        MessageChatMemoryAdvisor.builder(dbChatMemory).build(),
+                        MessageChatMemoryAdvisor.builder(dbChatMemory).build(),
                         selfLogAdvisor
                 ).build();
 

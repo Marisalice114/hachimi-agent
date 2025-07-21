@@ -3,37 +3,18 @@ spring:
     name: hachimi-agent
   profiles:
     active: local
-
-  # 主数据源 - MySQL (保持原有配置路径，对话存储)
   datasource:
-    url: jdbc:mysql://localhost:3306/hachimi_agent?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    username: root
-    password: 123456
+    # MySQL 数据库配置
+    # url: jdbc:mysql://localhost:3306/hachimi_agent?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+    # driver-class-name: com.mysql.cj.jdbc.Driver
+    # PGSQL 数据库配置
+    url: jdbc:postgresql://rm-cn-w5g4cx7e400027ao.rwlb.rds.aliyuncs.com:5432/hachimi_agent
+    driver-class-name: org.postgresql.Driver
     # Druid 连接池配置
-    initial-size: 5
-    min-idle: 5
-    max-active: 20
-    max-wait: 60000
-    time-between-eviction-runs-millis: 60000
-    min-evictable-idle-time-millis: 300000
-    validation-query: SELECT 1
-    test-while-idle: true
-    test-on-borrow: false
-    test-on-return: false
-    pool-prepared-statements: true
-    max-pool-prepared-statement-per-connection-size: 20
-
-    # 向量数据源 - PostgreSQL (RAG知识库)
-    vector:
-      url: jdbc:postgresql://rm-cn-w5g4cx7e400027ao.rwlb.rds.aliyuncs.com:5432/hachimi_agent
-      driver-class-name: org.postgresql.Driver
-      username: 19983136688
-      password: Zh810271689
-      # Druid 连接池配置
-      initial-size: 3
-      min-idle: 3
-      max-active: 10
+    druid:
+      initial-size: 5
+      min-idle: 5
+      max-active: 20
       max-wait: 60000
       time-between-eviction-runs-millis: 60000
       min-evictable-idle-time-millis: 300000
@@ -43,7 +24,6 @@ spring:
       test-on-return: false
       pool-prepared-statements: true
       max-pool-prepared-statement-per-connection-size: 20
-
   ai:
     ollama:
       base-url: http://localhost:11434

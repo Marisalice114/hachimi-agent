@@ -9,6 +9,7 @@ import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.ai.chat.messages.Message;
+import org.springframework.ai.rag.retrieval.join.ConcatenationDocumentJoiner;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.Rollback;
@@ -149,4 +150,5 @@ class LoveAppTest {
         String result = loveApp.doChatWithCloudRAG(userMessage, chatId);
         System.out.println(result);
     }
+
 }

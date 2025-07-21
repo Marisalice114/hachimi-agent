@@ -23,9 +23,9 @@ public class PGVectorVectorConfig {
 
 
     @Bean
-    public VectorStore pgVectorVectorStore(JdbcTemplate jdbcTemplate, @Qualifier("ollamaEmbeddingModel") EmbeddingModel ollamaEmbeddingModel) {
+    public VectorStore pgVectorVectorStore(@Qualifier("vectorJdbcTemplate")JdbcTemplate vectorJdbcTemplate, @Qualifier("ollamaEmbeddingModel") EmbeddingModel ollamaEmbeddingModel) {
         //jdbc模板和嵌入模型
-        PgVectorStore pgVectorStore= PgVectorStore.builder(jdbcTemplate, ollamaEmbeddingModel)
+        PgVectorStore pgVectorStore= PgVectorStore.builder(vectorJdbcTemplate, ollamaEmbeddingModel)
 //                .dimensions(1536)                    // Optional: defaults to model dimensions or 1536
                 .distanceType(COSINE_DISTANCE)       // Optional: defaults to COSINE_DISTANCE
                 .indexType(HNSW)                     // Optional: defaults to HNSW
