@@ -10,6 +10,7 @@ import org.springframework.ai.chat.client.advisor.api.CallAdvisor;
 import org.springframework.ai.chat.client.advisor.api.CallAdvisorChain;
 import org.springframework.ai.chat.client.advisor.api.StreamAdvisor;
 import org.springframework.ai.chat.client.advisor.api.StreamAdvisorChain;
+import org.springframework.ai.chat.messages.Message;
 import reactor.core.publisher.Flux;
 
 
@@ -19,12 +20,22 @@ public class SelfLogAdvisor implements CallAdvisor, StreamAdvisor {
 
     @Override
     public ChatClientResponse adviseCall(ChatClientRequest chatClientRequest, CallAdvisorChain callAdvisorChain) {
-        // 记录用户输入
+        log.info("🔍 [SelfLogAdvisor] 开始处理请求");
+        log.info("🔍 [SelfLogAdvisor] 当前Instructions数量: {}", chatClientRequest.prompt().getInstructions().size());
+
+        // 显示当前所有instruction
+        for (int i = 0; i < chatClientRequest.prompt().getInstructions().size(); i++) {
+            Message msg = chatClientRequest.prompt().getInstructions().get(i);
+            log.info("   [{}] {}: {} 字符", i, msg.getClass().getSimpleName(), msg.getText().length());
+        }
+
         log.info("User: {}", extractLastUserMessage(chatClientRequest));
 
+        // ✅ 调用下一个advisor前后对比
+        log.info("🔄 [SelfLogAdvisor] 调用下一个advisor...");
         ChatClientResponse response = callAdvisorChain.nextCall(chatClientRequest);
+        log.info("🔄 [SelfLogAdvisor] advisor链调用完成");
 
-        // 记录AI回复
         log.info("AI: {}", extractAIContent(response));
         return response;
     }
@@ -95,6 +106,6 @@ public class SelfLogAdvisor implements CallAdvisor, StreamAdvisor {
 
     @Override
     public int getOrder() {
-        return 0;
+        return 1000;
     }
 }

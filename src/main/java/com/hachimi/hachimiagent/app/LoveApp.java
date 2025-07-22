@@ -19,6 +19,8 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+import static com.hachimi.hachimiagent.rag.LoveAppRagCustomAdvisorFactory.createLoveAppRagCustomAdvisor;
+
 @Component
 @Slf4j
 public class LoveApp {
@@ -80,7 +82,9 @@ public class LoveApp {
 //                        //基于内存存储的向量存储
 //                        QuestionAnswerAdvisor.builder(loveAppVectorStore).build(),
                         //基于pgVector的向量存储
-                        QuestionAnswerAdvisor.builder(pgVectorVectorStore).build(),
+//                        QuestionAnswerAdvisor.builder(pgVectorVectorStore).build(),
+                        //基于自建工厂的rag
+                        createLoveAppRagCustomAdvisor(pgVectorVectorStore, "已婚"),
                         MessageChatMemoryAdvisor.builder(dbChatMemory).build(),
                         selfLogAdvisor
                 ).build();
