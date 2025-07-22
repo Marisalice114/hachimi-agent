@@ -5,13 +5,12 @@ import com.hachimi.hachimiagent.entity.ChatConversation;
 import com.hachimi.hachimiagent.entity.ChatMessage;
 import com.hachimi.hachimiagent.mapper.ChatConversationMapper;
 import com.hachimi.hachimiagent.mapper.ChatMessageMapper;
+import com.hachimi.hachimiagent.rag.QueryTransformer;
 import jakarta.annotation.Resource;
-import org.junit.jupiter.api.Assertions;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.ai.chat.messages.Message;
-import org.springframework.ai.document.Document;
-import org.springframework.ai.rag.retrieval.join.ConcatenationDocumentJoiner;
-import org.springframework.ai.rag.retrieval.search.VectorStoreDocumentRetriever;
+import org.springframework.ai.rag.generation.augmentation.QueryAugmenter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.Rollback;
@@ -25,6 +24,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest
 @Transactional
 @Rollback(false)  // 禁用事务回滚，让数据真正保存到数据库
+@Slf4j
 class LoveAppTest {
     @Resource
     private LoveApp loveApp;
@@ -37,9 +37,12 @@ class LoveAppTest {
 
     @Resource
     private ChatMessageMapper messageMapper;
-    @Autowired
+
+    @Resource
     private MysqlBasedChatMemoryRepository mysqlBasedChatMemoryRepository;
 
+    @Resource
+    private QueryTransformer queryTransformer;
     @Test
     @Rollback(false)
     void doChatTest() {
@@ -140,6 +143,7 @@ class LoveAppTest {
         String chatId = UUID.randomUUID().toString();
         //第一轮
         String userMessage = "我已经结婚了，但是婚后关系不太亲密，我该如何妥善解决";
+//        String userMessage = "";
         String result = loveApp.doChatWithRAG(userMessage, chatId);
         System.out.println(result);
     }
@@ -153,4 +157,113 @@ class LoveAppTest {
         System.out.println(result);
     }
 
+    @Test
+    void testEmptyContextBehavior(){
+        log.info("🧪 开始空上下文行为测试...");
+
+        String chatId = UUID.randomUUID().toString();
+
+        // ✅ 这些查询应该触发空上下文模板（检索不到文档）
+        String[] emptyContextQueries = {
+                "今天天气怎么样？",      // 完全无关
+                "怎么做红烧肉？",        // 完全无关（如果阈值设置正确）
+                "如何学习编程？",        // 完全无关
+                "什么是人工智能？",      // 完全无关
+                "北京有什么好玩的？"     // 完全无关
+        };
+
+        // ✅ 这些查询应该正常回答（检索到相关文档）
+        String[] normalQueries = {
+                "单身如何脱单？",        // 恋爱相关
+                "恋爱焦虑怎么办？",      // 恋爱相关
+                "相亲要注意什么？"       // 恋爱相关
+        };
+
+        log.info("📋 测试应该触发拒绝模板的查询：");
+        for (String query : emptyContextQueries) {
+            log.info("🔍 测试查询: {}", query);
+            String result = loveApp.doChatWithRAG(query, chatId + "_empty_" + query.hashCode());
+
+            // ✅ 检查是否使用了拒绝模板
+            boolean usesTemplate = result.contains("抱歉，我只能回答恋爱相关的内容") &&
+                    result.contains("哈基米哈基米");
+
+            log.info("   -> 使用拒绝模板: {}", usesTemplate);
+
+            if (usesTemplate) {
+                log.info("   ✅ 正确！使用了空上下文模板");
+            } else {
+                log.warn("   ❌ 错误！应该使用拒绝模板，但实际回复: {}",
+                        result.substring(0, Math.min(100, result.length())));
+            }
+        }
+
+        log.info("\n📋 测试应该正常回答的查询：");
+        for (String query : normalQueries) {
+            log.info("🔍 测试查询: {}", query);
+            String result = loveApp.doChatWithRAG(query, chatId + "_normal_" + query.hashCode());
+
+            // ✅ 检查是否给出了正常回答（不是拒绝模板）
+            boolean hasNormalAnswer = !result.contains("抱歉，我只能回答恋爱相关的内容");
+
+            log.info("   -> 有正常回答: {}", hasNormalAnswer);
+
+            if (hasNormalAnswer) {
+                log.info("   ✅ 正确！给出了恋爱相关的建议");
+            } else {
+                log.warn("   ❌ 错误！不应该使用拒绝模板，实际回复: {}",
+                        result.substring(0, Math.min(100, result.length())));
+            }
+        }
+    }
+
+    @Test
+    void testEmptyContextWithDetailedLogging() {
+        log.info("🧪 开始空上下文详细调试测试...");
+
+        String chatId = UUID.randomUUID().toString();
+
+        // 测试完全无关的查询
+        String[] testQueries = {
+                "今天天气怎么样？",
+                "怎么做红烧肉？",
+                "如何学习编程？",
+                "单身如何脱单？"  // 这个应该有结果
+        };
+
+        for (String originalQuery : testQueries) {
+            log.info("\n" + "=".repeat(50));
+            log.info("🔍 测试原始查询: '{}'", originalQuery);
+
+            // 1. 先测试查询重写结果
+            String rewrittenQuery = queryTransformer.doQueryRewrite(originalQuery);
+            log.info("📝 查询重写结果: '{}'", rewrittenQuery);
+
+            // 2. 测试向量检索结果（你需要注入VectorStore来直接测试）
+            // testDirectVectorSearch(rewrittenQuery);
+
+            // 3. 测试完整的RAG调用
+            String result = loveApp.doChatWithRAG(originalQuery, chatId + "_" + originalQuery.hashCode());
+
+            // 4. 分析结果
+            boolean isEmptyContextResponse = result.contains("抱歉，我只能回答恋爱相关的内容")
+                    && result.contains("哈基米哈基米");
+
+            log.info("📊 结果分析:");
+            log.info("   - 原始查询: {}", originalQuery);
+            log.info("   - 重写查询: {}", rewrittenQuery);
+            log.info("   - 使用空上下文模板: {}", isEmptyContextResponse);
+            log.info("   - 实际回复: {}", result.substring(0, Math.min(100, result.length())));
+
+            if (originalQuery.contains("脱单")) {
+                // 这个应该有正常回复
+                assertFalse(isEmptyContextResponse, "恋爱相关查询不应该触发空上下文模板");
+            } else {
+                // 这些应该触发空上下文模板
+                assertTrue(isEmptyContextResponse,
+                        String.format("无关查询 '%s' 应该触发空上下文模板，但实际回复: %s",
+                                originalQuery, result.substring(0, Math.min(50, result.length()))));
+            }
+        }
+    }
 }

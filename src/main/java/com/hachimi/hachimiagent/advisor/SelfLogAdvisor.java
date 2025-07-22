@@ -20,18 +20,10 @@ public class SelfLogAdvisor implements CallAdvisor, StreamAdvisor {
 
     @Override
     public ChatClientResponse adviseCall(ChatClientRequest chatClientRequest, CallAdvisorChain callAdvisorChain) {
-        log.info("🔍 [SelfLogAdvisor] 开始处理请求");
-        log.info("🔍 [SelfLogAdvisor] 当前Instructions数量: {}", chatClientRequest.prompt().getInstructions().size());
-
-        // 显示当前所有instruction
-        for (int i = 0; i < chatClientRequest.prompt().getInstructions().size(); i++) {
-            Message msg = chatClientRequest.prompt().getInstructions().get(i);
-            log.info("   [{}] {}: {} 字符", i, msg.getClass().getSimpleName(), msg.getText().length());
-        }
 
         log.info("User: {}", extractLastUserMessage(chatClientRequest));
 
-        // ✅ 调用下一个advisor前后对比
+        //调用下一个advisor前后对比
         log.info("🔄 [SelfLogAdvisor] 调用下一个advisor...");
         ChatClientResponse response = callAdvisorChain.nextCall(chatClientRequest);
         log.info("🔄 [SelfLogAdvisor] advisor链调用完成");

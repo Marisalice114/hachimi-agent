@@ -82,9 +82,9 @@ public class LoveApp {
 //                        //基于内存存储的向量存储
 //                        QuestionAnswerAdvisor.builder(loveAppVectorStore).build(),
                         //基于pgVector的向量存储
-//                        QuestionAnswerAdvisor.builder(pgVectorVectorStore).build(),
+                        QuestionAnswerAdvisor.builder(pgVectorVectorStore).build(),
                         //基于自建工厂的rag
-                        createLoveAppRagCustomAdvisor(pgVectorVectorStore, "已婚"),
+//                        createLoveAppRagCustomAdvisor(pgVectorVectorStore, "单身"),
                         MessageChatMemoryAdvisor.builder(dbChatMemory).build(),
                         selfLogAdvisor
                 ).build();
@@ -155,7 +155,7 @@ public class LoveApp {
         //查询重写
 //        log.info("Original message: {}", message);
         String rewriteMessage = queryTransformer.doQueryRewrite(message);
-//        log.info("Rewritten message: {}", rewriteMessage);
+        log.info("Rewritten message: {}", rewriteMessage);
 
         // 使用预配置的RAG专用客户端，所有advisors已经配置好
         ChatResponse chatResponse = ragChatClient.prompt()

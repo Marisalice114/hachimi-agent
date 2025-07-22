@@ -1,5 +1,6 @@
 package com.hachimi.hachimiagent.rag;
 
+import com.hachimi.hachimiagent.app.LoveApp;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.advisor.api.Advisor;
 import org.springframework.ai.document.Document;
@@ -11,6 +12,8 @@ import org.springframework.ai.vectorstore.filter.Filter;
 import org.springframework.ai.vectorstore.filter.FilterExpressionBuilder;
 
 import java.util.List;
+
+import static com.hachimi.hachimiagent.rag.LoveAppContextualQueryAugmenterFactory.createLoveAppContextualQueryAugmenter;
 
 
 @Slf4j
@@ -38,17 +41,20 @@ public class LoveAppRagCustomAdvisorFactory {
 
         DocumentRetriever retriever = VectorStoreDocumentRetriever.builder()
                 .vectorStore(vectorStore)
-                .similarityThreshold(0.3)
-                .topK(5)
+//                .similarityThreshold(0.3)
+                .topK(3)
                 .filterExpression(filterStatus)
                 .build();
         log.info("🔧 [RAG工厂] 创建文档检索器完成");
 
         Advisor advisor = RetrievalAugmentationAdvisor.builder()
                 .documentRetriever(retriever)
+                .queryAugmenter(createLoveAppContextualQueryAugmenter())
                 .build();
         log.info("✅ [RAG工厂] RAG Advisor创建完成: {}", advisor.getClass().getSimpleName());
 
         return advisor;
     }
+
+
 }
