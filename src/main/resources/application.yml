@@ -56,6 +56,10 @@ spring:
         index-type: HNSW                    # 向量索引类型
         distance-type: COSINE_DISTANCE     # 距离计算方式
         max-document-batch-size: 10000     # 批处理大小
+    baidu:
+      translation:
+        app-id: 20201128000628785
+        app-secret: SId_xkccAlBR6D5an3vi
 
 
 # MyBatis-Plus 配置
@@ -79,6 +83,7 @@ logging:
     com.hachimi.hachimiagent: INFO
     com.hachimi.hachimiagent.mapper: INFO
     org.springframework.ai: INFO
+    com.hachimi.hachimiagent.rag.TranslationQueryTransformer: DEBUG
 
 server:
   port: 8123

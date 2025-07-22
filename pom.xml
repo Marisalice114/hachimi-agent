@@ -138,10 +138,6 @@
                 </exclusion>
             </exclusions>
         </dependency>
-        <dependency>
-            <groupId>org.springframework.ai</groupId>
-            <artifactId>spring-ai-advisors-vector-store</artifactId>
-        </dependency>
 
         <!-- 支持结构化输出 -->
         <dependency>
@@ -184,6 +180,12 @@
             <version>1.0.0</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-configuration-processor</artifactId>
+            <optional>true</optional>
+        </dependency>
+
     </dependencies>
 
     <build>
@@ -201,7 +203,10 @@
                     </annotationProcessorPaths>
                     <source>21</source>
                     <target>21</target>
-                    <compilerArgs>--enable-preview</compilerArgs>
+                    <!-- 移除预览功能配置 -->
+                    <!-- <compilerArgs>
+                        <arg>-enable-preview</arg>
+                    </compilerArgs> -->
                 </configuration>
             </plugin>
             <plugin>
