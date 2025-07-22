@@ -12,7 +12,7 @@ import java.util.List;
  * 适用于处理大文本，确保每个文档的Token数量在指定范围内
  */
 @Component
-class MyTokenTextSplitter {
+public class MyTokenTextSplitter {
     public List<Document> splitDocuments(List<Document> documents) {
         TokenTextSplitter splitter = new TokenTextSplitter();
         return splitter.apply(documents);

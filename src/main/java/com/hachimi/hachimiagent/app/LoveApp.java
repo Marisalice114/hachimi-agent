@@ -2,6 +2,7 @@ package com.hachimi.hachimiagent.app;
 
 import com.hachimi.hachimiagent.advisor.SelfLogAdvisor;
 import com.hachimi.hachimiagent.chatmemory.MysqlBasedChatMemoryRepository;
+import com.hachimi.hachimiagent.rag.QueryTransformer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
@@ -29,6 +30,7 @@ public class LoveApp {
     private final ChatMemory dbChatMemory;
     private final SelfLogAdvisor selfLogAdvisor;
     private final ChatMemory baseChatMemory;
+    private final QueryTransformer queryTransformer;
 
     private static final String SYSTEM_PROMPT = "扮演深耕恋爱心理领域的专家。开场向用户表明身份，告知用户可倾诉恋爱难题。" +
             "围绕单身、恋爱、已婚三种状态提问：单身状态询问社交圈拓展及追求心仪对象的困扰；" +
@@ -45,15 +47,16 @@ public class LoveApp {
      */
     public LoveApp(ChatModel dashscopeChatModel,
                    MysqlBasedChatMemoryRepository mysqlBasedChatMemoryRepository,
-                   VectorStore loveAppVectorStore,
+//                   VectorStore loveAppVectorStore, // 暂时移除
                    VectorStore pgVectorVectorStore,
-                   @Qualifier("loveAppRagCloudAdvisor") Advisor loveAppRagCloudAdvisor) {
+                   @Qualifier("loveAppRagCloudAdvisor") Advisor loveAppRagCloudAdvisor, QueryTransformer queryTransformer) {
 
         // 1. 初始化内部组件
         this.dbChatMemory = MessageWindowChatMemory.builder()
                 .chatMemoryRepository(mysqlBasedChatMemoryRepository)
                 .maxMessages(20)
                 .build();
+        this.queryTransformer = queryTransformer;
         this.selfLogAdvisor = new SelfLogAdvisor();
 
         InMemoryChatMemoryRepository chatMemoryRepository = new InMemoryChatMemoryRepository();
@@ -145,9 +148,14 @@ public class LoveApp {
      * @return 助手回复的消息内容
      */
     public String doChatWithRAG(String message, String chatId) {
+        //查询重写
+//        log.info("Original message: {}", message);
+        String rewriteMessage = queryTransformer.doQueryRewrite(message);
+//        log.info("Rewritten message: {}", rewriteMessage);
+
         // 使用预配置的RAG专用客户端，所有advisors已经配置好
         ChatResponse chatResponse = ragChatClient.prompt()
-                .user(message)
+                .user(rewriteMessage)
                 //告诉 MessageChatMemoryAdvisor 使用哪个对话ID来存取历史记录
                 .advisors(a -> a.param(ChatMemory.CONVERSATION_ID, chatId))
                 .call()

@@ -39,11 +39,22 @@ public class LoveAppMarkdownReader {
             for (Resource resource : resources) {
                 // 文件名
                 String filename = resource.getFilename();
+                // 去掉 .md 后缀
+                String filenameWithoutExtension = filename.substring(0, filename.lastIndexOf('.'));
+                // 提取倒数第二个和第三个字作为状态
+                String status = "";
+                if (filenameWithoutExtension.length() >= 3) {
+                    status = filenameWithoutExtension.substring(
+                            filenameWithoutExtension.length() - 3,
+                            filenameWithoutExtension.length() - 1
+                    );
+                }
                 MarkdownDocumentReaderConfig config = MarkdownDocumentReaderConfig.builder()
                         .withHorizontalRuleCreateDocument(true)
                         .withIncludeCodeBlock(false)
                         .withIncludeBlockquote(false)
-                        .withAdditionalMetadata("filename", filename) //每篇文档的额外信息
+                        .withAdditionalMetadata("filename", filename) //每篇文档的metadata
+                        .withAdditionalMetadata("status", status) //每篇文档的状态
                         .build();
                 MarkdownDocumentReader reader = new MarkdownDocumentReader(resource, config);
                 allDocuments.addAll(reader.get());

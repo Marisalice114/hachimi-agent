@@ -1,6 +1,8 @@
 package com.hachimi.hachimiagent.configuration;
 
 
+import com.hachimi.hachimiagent.ETL.MyKeyWordEnricher;
+import com.hachimi.hachimiagent.ETL.MyTokenTextSplitter;
 import com.hachimi.hachimiagent.rag.LoveAppMarkdownReader;
 import jakarta.annotation.Resource;
 import org.springframework.ai.document.Document;
@@ -10,6 +12,7 @@ import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 
 
 import java.util.List;
@@ -20,11 +23,22 @@ public class LoveAppVectorStoreConfig {
     @Resource
     private LoveAppMarkdownReader loveAppMarkdownReader;
 
+    @Resource
+    private MyTokenTextSplitter myTokenTextSplitter;
+
+    @Resource
+    private MyKeyWordEnricher myKeyWordEnricher;
+
     @Bean("loveAppVectorStore")
+    @Lazy
     public VectorStore loveAppVectorStore(@Qualifier("ollamaEmbeddingModel") EmbeddingModel ollamaEmbeddingModel) {
         SimpleVectorStore simpleVectorStore = SimpleVectorStore.builder(ollamaEmbeddingModel).build();
         List<Document> documents = loveAppMarkdownReader.LoadMarkdownDocuments();
-        simpleVectorStore.add(documents);
+        //自定义文档切分
+        List<Document> splitDocuments = myTokenTextSplitter.splitCustomized(documents);
+        //自动补充文档的metadata
+        List<Document> enrichDocuments = myKeyWordEnricher.enrichDocuments(splitDocuments);
+        simpleVectorStore.add(enrichDocuments);
         return simpleVectorStore;
     }
 
