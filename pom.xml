@@ -22,14 +22,6 @@
 
     <dependencyManagement>
         <dependencies>
-            <!-- Spring AI Alibaba BOM -->
-            <dependency>
-                <groupId>com.alibaba.cloud.ai</groupId>
-                <artifactId>spring-ai-alibaba-bom</artifactId>
-                <version>${spring-ai-alibaba.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
             <!-- Spring AI BOM -->
             <dependency>
                 <groupId>org.springframework.ai</groupId>
@@ -38,6 +30,15 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
+            <!-- Spring AI Alibaba BOM -->
+            <dependency>
+                <groupId>com.alibaba.cloud.ai</groupId>
+                <artifactId>spring-ai-alibaba-bom</artifactId>
+                <version>${spring-ai-alibaba.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
         </dependencies>
     </dependencyManagement>
 

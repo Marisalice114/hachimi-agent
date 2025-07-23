@@ -8,6 +8,7 @@ import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfWriter;
 import com.itextpdf.layout.Document;
 import com.itextpdf.layout.element.Paragraph;
+import org.springframework.ai.model.tool.ToolCallingManager;
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.ai.tool.annotation.ToolParam;
 
@@ -15,7 +16,8 @@ import java.io.IOException;
 
 public class PDFGenerationTool {
 
-    @Tool(description = "Generate a PDF file with given content")
+    //立即返回
+    @Tool(description = "Generate a PDF file with given content",returnDirect = true)
     public String generatePDF(
             @ToolParam(description = "Name of the file to save the generated PDF") String fileName,
             @ToolParam(description = "Content to be included in the PDF") String content) {

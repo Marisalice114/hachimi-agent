@@ -1,6 +1,7 @@
 package com.hachimi.hachimiagent.tools;
 
 
+import org.springframework.ai.model.tool.ToolCallingManager;
 import org.springframework.ai.support.ToolCallbacks;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.beans.factory.annotation.Value;
