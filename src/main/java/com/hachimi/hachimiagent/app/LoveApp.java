@@ -3,6 +3,7 @@ package com.hachimi.hachimiagent.app;
 import com.hachimi.hachimiagent.advisor.SelfLogAdvisor;
 import com.hachimi.hachimiagent.chatmemory.MysqlBasedChatMemoryRepository;
 import com.hachimi.hachimiagent.rag.QueryTransformer;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
@@ -13,6 +14,7 @@ import org.springframework.ai.chat.memory.InMemoryChatMemoryRepository;
 import org.springframework.ai.chat.memory.MessageWindowChatMemory;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
+import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
@@ -207,5 +209,25 @@ public class LoveApp {
         String chatResult = chatResponse.getResult().getOutput().getText();
         log.info("cloudRagAnswer: {}", chatResult);
         return chatResult;
+    }
+
+
+
+    //ai工具调用
+    @Resource
+    private ToolCallback[] allTools;
+
+    public String doChatWithTools(String userMessage, String chatId) {
+        // 调用chatClient进行对话，使用官方文档推荐的方式传递对话ID
+        ChatResponse chatResponse = ragChatClient.prompt()
+                .user(userMessage)
+                //告诉 MessageChatMemoryAdvisor 使用哪个对话ID来存取历史记录
+                .advisors(a -> a.param(ChatMemory.CONVERSATION_ID, chatId))
+                .toolCallbacks(allTools)
+                .call()
+                .chatResponse();
+        String content = chatResponse.getResult().getOutput().getText();
+        log.info("content: {}", content );
+        return content ;
     }
 }
