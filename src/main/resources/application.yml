@@ -30,19 +30,19 @@ spring:
       driver-class-name: org.postgresql.Driver
       username: 19983136688
       password: Zh810271689
-      # Druid 连接池配置
-      initial-size: 3
-      min-idle: 3
-      max-active: 10
-      max-wait: 60000
-      time-between-eviction-runs-millis: 60000
-      min-evictable-idle-time-millis: 300000
-      validation-query: SELECT 1
-      test-while-idle: true
-      test-on-borrow: false
-      test-on-return: false
-      pool-prepared-statements: true
-      max-pool-prepared-statement-per-connection-size: 20
+#      # Druid 连接池配置
+#      initial-size: 3
+#      min-idle: 3
+#      max-active: 10
+#      max-wait: 60000
+#      time-between-eviction-runs-millis: 60000
+#      min-evictable-idle-time-millis: 300000
+#      validation-query: SELECT 1
+#      test-while-idle: true
+#      test-on-borrow: false
+#      test-on-return: false
+#      pool-prepared-statements: true
+#      max-pool-prepared-statement-per-connection-size: 20
 
   ai:
     ollama:
@@ -60,6 +60,14 @@ spring:
       translation:
         app-id: 20201128000628785
         app-secret: SId_xkccAlBR6D5an3vi
+    mcp:
+      client:
+        request-timeout: 30s
+        type: SYNC  # or ASYNC for reactive applications
+        stdio:
+          servers-configuration: classpath:mcp-servers.json
+
+
 
 
 # MyBatis-Plus 配置

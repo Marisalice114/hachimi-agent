@@ -3,6 +3,7 @@ package com.hachimi.hachimiagent.app;
 import com.hachimi.hachimiagent.advisor.SelfLogAdvisor;
 import com.hachimi.hachimiagent.chatmemory.MysqlBasedChatMemoryRepository;
 import com.hachimi.hachimiagent.rag.QueryTransformer;
+
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
@@ -16,6 +17,7 @@ import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.model.tool.DefaultToolCallingManager;
 import org.springframework.ai.tool.ToolCallback;
+import org.springframework.ai.tool.ToolCallbackProvider;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
@@ -218,6 +220,7 @@ public class LoveApp {
     @Resource
     private ToolCallback[] allTools;
 
+
     public String doChatWithTools(String userMessage, String chatId) {
         // 调用chatClient进行对话，使用官方文档推荐的方式传递对话ID
         ChatResponse chatResponse = ragChatClient.prompt()
@@ -228,7 +231,35 @@ public class LoveApp {
                 .call()
                 .chatResponse();
         String content = chatResponse.getResult().getOutput().getText();
-        log.info("content: {}", content );
+        log.info("Toolscontent: {}", content );
         return content ;
     }
+
+    //AI调用MCP
+    @Resource
+    private ToolCallbackProvider toolCallbackProvider;
+
+//    // 同步客户端
+//    @Resource
+//    private List<McpSyncClient> mcpSyncClients;
+//
+//    // 异步客户端
+//    @Resource
+//    private List<McpAsyncClient> mcpAsyncClients;
+
+
+    public String doChatWithMCP(String userMessage, String chatId) {
+        // 调用chatClient进行对话，使用官方文档推荐的方式传递对话ID
+        ChatResponse chatResponse = ragChatClient.prompt()
+                .user(userMessage)
+                //告诉 MessageChatMemoryAdvisor 使用哪个对话ID来存取历史记录
+                .advisors(a -> a.param(ChatMemory.CONVERSATION_ID, chatId))
+                .toolCallbacks(toolCallbackProvider.getToolCallbacks())
+                .call()
+                .chatResponse();
+        String content = chatResponse.getResult().getOutput().getText();
+        log.info("MCPcontent: {}", content );
+        return content ;
+    }
+
 }

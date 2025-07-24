@@ -1,0 +1,10 @@
+spring:
+  application:
+    name: hachimi-image-search-mcp-server
+  profiles:
+    active: stdio,local
+
+server:
+  port: 910
+
+
