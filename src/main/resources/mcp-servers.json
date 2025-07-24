@@ -9,6 +9,19 @@
       "env": {
         "BAIDU_MAP_API_KEY": "S9vBNqPqglOJtJbmFEA9v3ucymHhgpyN"
       }
+    },
+    "hachimi-image-search-mcp-server": {
+      "command": "java",
+      "args": [
+        "-Dspring.ai.mcp.server.stdio=true",
+        "-Dspring.main.web-application-type=none",
+        "-Dlogging.pattern.console=",
+        "-jar",
+        "hachimi-image-search-mcp-server/target/hachimi-image-search-mcp-server-0.0.1-SNAPSHOT.jar"
+      ],
+      "env": {
+      }
     }
   }
 }
+

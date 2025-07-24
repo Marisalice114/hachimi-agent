@@ -300,7 +300,12 @@ class LoveAppTest {
     void doChatWithMCP() {
         String chatId = UUID.randomUUID().toString();
         //测试地图MCP
-        String userMessage = "我的另一半住在上海静安区，请帮我找到5公里内合适的约会地点";
+//        String userMessage = "我的另一半住在上海静安区，请帮我找到5公里内合适的约会地点";
+//        String result = loveApp.doChatWithMCP(userMessage, chatId);
+//        System.out.println(result);
+
+        //测试图片搜索MCP
+        String userMessage = "帮我搜索一些哄女朋友开心的图片";
         String result = loveApp.doChatWithMCP(userMessage, chatId);
         System.out.println(result);
     }
