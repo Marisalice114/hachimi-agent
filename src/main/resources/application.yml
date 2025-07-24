@@ -64,12 +64,12 @@ spring:
       client:
         request-timeout: 30s
         type: SYNC  # or ASYNC for reactive applications
-#        stdio:
-#          servers-configuration: classpath:mcp-servers.json
-        sse:
-          connections:
-            server1:
-              url: http://localhost:910
+        stdio:
+          servers-configuration: classpath:mcp-servers.json
+#        sse:
+#          connections:
+#            server1:
+#              url: http://localhost:910
 
 
 

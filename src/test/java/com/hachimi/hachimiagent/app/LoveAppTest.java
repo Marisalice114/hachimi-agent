@@ -305,7 +305,7 @@ class LoveAppTest {
 //        System.out.println(result);
 
         //测试图片搜索MCP
-        String userMessage = "帮我搜索一些哄女朋友开心的图片";
+        String userMessage = "帮我搜索一些哄女朋友开心的图片，只需要一张即可";
         String result = loveApp.doChatWithMCP(userMessage, chatId);
         System.out.println(result);
     }
