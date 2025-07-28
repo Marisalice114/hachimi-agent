@@ -1,7 +1,17 @@
 <template>
   <div class="container">
+    <!-- 移动端菜单按钮 -->
+    <button class="mobile-menu-btn" @click="toggleSidebar" aria-label="切换菜单">
+      <span class="hamburger"></span>
+      <span class="hamburger"></span>
+      <span class="hamburger"></span>
+    </button>
+    
+    <!-- 移动端遮罩层 -->
+    <div v-if="sidebarOpen" class="sidebar-overlay" @click="toggleSidebar"></div>
+    
     <!-- 侧边栏 -->
-    <div class="sidebar">
+    <div class="sidebar" :class="{ open: sidebarOpen }">
       <div class="sidebar-header">
         <button @click="createNewChat" class="new-chat-btn">
           + 新建对话
@@ -105,16 +115,52 @@ export default {
       isTyping: false,
       currentAiMessage: '',
       editingSessionId: null,
-      editingSessionName: ''
+      editingSessionName: '',
+      sidebarOpen: false
     }
   },
   
   async mounted() {
+    this.updateMetaTags()
     await this.loadSessions()
     this.createNewChat()
   },
   
   methods: {
+    // 更新SEO meta标签
+    updateMetaTags() {
+      document.title = 'AI恋爱大师 - Hachimi Agent'
+      this.updateMetaTag('description', 'AI恋爱大师提供专业的恋爱咨询和情感建议，帮助您解决恋爱中的各种问题，获得个性化的情感指导')
+      this.updateMetaTag('keywords', 'AI恋爱大师,恋爱咨询,情感建议,恋爱指导,情感AI,恋爱问题')
+      this.updateMetaProperty('og:title', 'AI恋爱大师 - 专业恋爱咨询服务')
+      this.updateMetaProperty('og:description', '获得AI恋爱大师的专业情感建议，解决您的恋爱困惑')
+    },
+    
+    updateMetaTag(name, content) {
+      let meta = document.querySelector(`meta[name="${name}"]`)
+      if (!meta) {
+        meta = document.createElement('meta')
+        meta.name = name
+        document.head.appendChild(meta)
+      }
+      meta.content = content
+    },
+    
+    updateMetaProperty(property, content) {
+      let meta = document.querySelector(`meta[property="${property}"]`)
+      if (!meta) {
+        meta = document.createElement('meta')
+        meta.setAttribute('property', property)
+        document.head.appendChild(meta)
+      }
+      meta.content = content
+    },
+    
+    // 切换侧边栏
+    toggleSidebar() {
+      this.sidebarOpen = !this.sidebarOpen
+    },
+    
     // 创建新对话
     createNewChat() {
       this.currentChatId = generateChatId()

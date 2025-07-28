@@ -330,3 +330,9 @@ public class ChatHistoryService {
 
 相关的页面配色风格和布局风格可以参考claude的会话页面
 
+
+
+# 页面优化
+
+现在我需要你帮我优化我的页面的样式，支持pc端平板和手机的响应式兼容，帮我优化每个页面的SEO，并且仿照这个页面[算法导航 - 交互式算法学习与可视化平台](https://algo.codefather.cn/)在底部增加版权信息，优化主页的样式，使用github上的高star风格，让人难忘
+

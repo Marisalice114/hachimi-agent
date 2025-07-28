@@ -100,10 +100,40 @@ export default {
   },
   
   mounted() {
+    this.updateMetaTags()
     this.createNewChat()
   },
   
   methods: {
+    // 更新SEO meta标签
+    updateMetaTags() {
+      document.title = 'AI超级智能体 - Hachimi Agent'
+      this.updateMetaTag('description', 'AI超级智能体是强大的多功能AI助手，为您提供全方位的智能服务，包括任务处理、问题解决和智能分析')
+      this.updateMetaTag('keywords', 'AI超级智能体,AI助手,智能任务处理,人工智能,智能分析,问题解决')
+      this.updateMetaProperty('og:title', 'AI超级智能体 - 多功能AI助手服务')
+      this.updateMetaProperty('og:description', '体验AI超级智能体的强大功能，获得全方位的智能服务支持')
+    },
+    
+    updateMetaTag(name, content) {
+      let meta = document.querySelector(`meta[name="${name}"]`)
+      if (!meta) {
+        meta = document.createElement('meta')
+        meta.name = name
+        document.head.appendChild(meta)
+      }
+      meta.content = content
+    },
+    
+    updateMetaProperty(property, content) {
+      let meta = document.querySelector(`meta[property="${property}"]`)
+      if (!meta) {
+        meta = document.createElement('meta')
+        meta.setAttribute('property', property)
+        document.head.appendChild(meta)
+      }
+      meta.content = content
+    },
+    
     // 创建新对话
     createNewChat() {
       this.currentChatId = generateChatId()
