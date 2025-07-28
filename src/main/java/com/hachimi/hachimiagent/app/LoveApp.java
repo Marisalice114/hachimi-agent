@@ -21,6 +21,7 @@ import org.springframework.ai.tool.ToolCallbackProvider;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Flux;
 
 import java.util.List;
 
@@ -262,4 +263,14 @@ public class LoveApp {
         return content ;
     }
 
+
+    public Flux<String> doChatByStream(String userMessage, String chatId) {
+        // 调用chatClient进行对话，使用官方文档推荐的方式传递对话ID
+        return ragChatClient.prompt()
+                .user(userMessage)
+                .advisors(a -> a.param(ChatMemory.CONVERSATION_ID, chatId))
+                .stream()
+//                .chatResponse() // 使用流式响应的时候，可以不需要反应响应的全部信息
+                .content();
+    }
 }

@@ -6,9 +6,12 @@ import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.messages.Message;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 
 @Data
@@ -33,6 +36,11 @@ public abstract class BaseAgent {
     //重复值
     private int duplicateThreshold = 2;
 
+    /**
+     * 同步输出
+     * @param userPrompt
+     * @return
+     */
     public String run(String userPrompt) {
         //传入输入
         this.nextStepPrompt = userPrompt;
@@ -87,6 +95,103 @@ public abstract class BaseAgent {
             currentStep = 0;
             log.info("Agent run completed. State reset to IDLE.");
         }
+    }
+
+
+    /**
+     * 流式输出 使用sseemiter来进行处理
+     * @param userPrompt
+     * @return
+     */
+    public SseEmitter runStream(String userPrompt) {
+        //定义SseEmitter
+        SseEmitter emitter = new SseEmitter(180000L); // 3分钟超时
+        //因为这里要进行现成异步处理
+        //如果不使用异步，那么emitter就需要一直等待后才能返回出去
+        CompletableFuture.runAsync(()->{
+            //传入输入
+            this.nextStepPrompt = userPrompt;
+            //判断当前状态
+            try {
+                if (state != AgentState.IDLE) {
+                    emitter.completeWithError( new IllegalStateException("Agent is not in IDLE state."));
+                    return ;
+                }
+                //传入内容为空
+                if (StrUtil.isBlank(userPrompt)) {
+                    emitter.completeWithError(new IllegalArgumentException("User prompt cannot be empty."));
+                    return ;
+                }
+            } catch (Exception e) {
+                emitter.completeWithError(e);
+            }
+            //更改状态
+            this.state = AgentState.RUNNING;
+            //保存结果
+            List<String> results = new ArrayList<>();
+            try {
+                while (currentStep < maxSteps && state != AgentState.FINISHED) {
+                    currentStep++;
+                    //记录执行步数
+                    log.info("Executing step: {}/{}", currentStep, maxSteps);
+                    //运行一步
+                    String stepResult = step();
+                    String result = "Step " + currentStep + ": " + stepResult;
+                    //判断是否循环
+                    if (is_stuck()) {
+                        handle_stuck_step();
+                        result = "Step " + currentStep + ": Stuck detected, handling stuck step.";
+                        log.warn("Stuck detected at step {}", currentStep);
+                        results.add(result);
+                        break;
+                    }
+                    results.add(result);
+                    //每完成一步都需要输出当前结果到sse
+                    emitter.send(result);
+                }
+                if (currentStep >= maxSteps) {
+                    state = AgentState.FINISHED;
+                    results.add("Reached maximum steps without finishing.");
+                    emitter.send("Reached maximum steps without finishing.");
+                }
+                //最后一定要完成一次响应
+                emitter.complete();;
+            } catch (Exception e) {
+                state = AgentState.ERROR;
+                log.error("An error occurred during agent execution: {}", e.getMessage(), e);
+                //每一次发送都有可能出错
+                try {
+                    emitter.send("error:"+e.getMessage());
+                    emitter.complete();
+                } catch (IOException ex) {
+                    emitter.completeWithError(ex);
+                }
+            } finally {
+                //清理资源
+                this.cleanup();
+                //重置状态
+                state = AgentState.IDLE;
+                currentStep = 0;
+                log.info("Agent run completed. State reset to IDLE.");
+            }
+        });
+
+        // 设置超时回调,注意要清理资源，而且判断完成状态是需要从运行状态转变为完成状态来判断
+        emitter.onTimeout(() -> {
+            state = AgentState.ERROR;
+            this.cleanup();
+            log.warn("SseEmitter timed out after 3 minutes.");
+            emitter.complete();
+        });
+        emitter.onCompletion(() -> {
+            if(state == AgentState.RUNNING) {
+                state = AgentState.FINISHED;
+            }
+            this.cleanup();
+            log.warn("SseEmitter timed out after 3 minutes.");
+            emitter.complete();
+        });
+        return emitter;
     }
 
 

@@ -30,19 +30,19 @@ spring:
       driver-class-name: org.postgresql.Driver
       username: 19983136688
       password: Zh810271689
-#      # Druid 连接池配置
-#      initial-size: 3
-#      min-idle: 3
-#      max-active: 10
-#      max-wait: 60000
-#      time-between-eviction-runs-millis: 60000
-#      min-evictable-idle-time-millis: 300000
-#      validation-query: SELECT 1
-#      test-while-idle: true
-#      test-on-borrow: false
-#      test-on-return: false
-#      pool-prepared-statements: true
-#      max-pool-prepared-statement-per-connection-size: 20
+  #      # Druid 连接池配置
+  #      initial-size: 3
+  #      min-idle: 3
+  #      max-active: 10
+  #      max-wait: 60000
+  #      time-between-eviction-runs-millis: 60000
+  #      min-evictable-idle-time-millis: 300000
+  #      validation-query: SELECT 1
+  #      test-while-idle: true
+  #      test-on-borrow: false
+  #      test-on-return: false
+  #      pool-prepared-statements: true
+  #      max-pool-prepared-statement-per-connection-size: 20
 
   ai:
     ollama:
@@ -117,6 +117,6 @@ springdoc:
       packages-to-scan: com.hachimi.hachimiagent.controller
 # knife4j的增强配置，不需要增强可以不配
 knife4j:
-  enable: true
+  enable: false
   setting:
     language: zh_cn

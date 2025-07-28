@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 
 
 //springboot启动的时候自动注入chatclient 所以这里也让其作为component
+//此处的manus是一个单例模式
 @Component
 public class HachimiManus extends ToolCallAgent {
 
