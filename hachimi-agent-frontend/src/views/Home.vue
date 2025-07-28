@@ -1,5 +1,36 @@
 <template>
   <div class="home-wrapper">
+    <!-- 动态背景效果 -->
+    <div class="background-effects">
+      <!-- 浮动粒子 -->
+      <div class="particles-container">
+        <div v-for="i in 40" :key="i" class="particle" :style="getParticleStyle(i)"></div>
+      </div>
+      
+      <!-- 渐变光晕 -->
+      <div class="gradient-orbs">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+        <div class="orb orb-4"></div>
+      </div>
+      
+      <!-- 网格背景 -->
+      <div class="grid-background"></div>
+      
+      <!-- 流星效果 -->
+      <div class="meteors-container">
+        <div v-for="i in 3" :key="i" class="meteor" :style="getMeteorStyle(i)"></div>
+      </div>
+      
+      <!-- 脉冲波纹 -->
+      <div class="pulse-waves">
+        <div class="pulse-wave pulse-wave-1"></div>
+        <div class="pulse-wave pulse-wave-2"></div>
+        <div class="pulse-wave pulse-wave-3"></div>
+      </div>
+    </div>
+
     <!-- 主要内容区域 -->
     <div class="home-container">
       <!-- Hero区域 -->
@@ -34,6 +65,94 @@
           <div class="stat-item">
             <div class="stat-number">99.9%</div>
             <div class="stat-label">可用性</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 交互式对话示例 -->
+      <div class="demo-section">
+        <h2 class="section-title">体验AI对话</h2>
+        <div class="chat-demo">
+          <div class="demo-chat-container">
+            <div class="demo-chat-header">
+              <div class="demo-header-info">
+                <div class="demo-avatar">🤖</div>
+                <div class="demo-title">
+                  <h4>Hachimi AI助手</h4>
+                  <span class="demo-status">在线</span>
+                </div>
+              </div>
+              <div class="demo-actions">
+                <button @click="clearDemo" class="demo-clear-btn" title="清空对话">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                  </svg>
+                </button>
+              </div>
+            </div>
+            
+            <div class="demo-chat-messages" ref="demoChatMessages">
+              <div v-for="message in demoMessages" :key="message.id" 
+                   :class="['demo-message', message.type]">
+                <div class="demo-message-avatar">
+                  {{ message.type === 'user' ? '👤' : '🤖' }}
+                </div>
+                <div class="demo-message-content">
+                  <div class="demo-message-text">{{ message.text }}</div>
+                  <div class="demo-message-time">{{ message.time }}</div>
+                </div>
+              </div>
+              
+              <!-- 正在输入提示 -->
+              <div v-if="isTyping" class="demo-message ai">
+                <div class="demo-message-avatar">🤖</div>
+                <div class="demo-message-content">
+                  <div class="typing-indicator">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="demo-chat-input">
+              <div class="demo-input-wrapper">
+                <input 
+                  v-model="demoInput" 
+                  @keyup.enter="sendDemoMessage"
+                  :disabled="isTyping || hasUsedDemo"
+                  :placeholder="hasUsedDemo ? '演示体验已结束，请使用完整版功能...' : '试试问我一些问题...'"
+                  class="demo-input"
+                />
+                <button 
+                  @click="sendDemoMessage" 
+                  :disabled="!demoInput.trim() || isTyping || hasUsedDemo"
+                  class="demo-send-btn"
+                >
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+                  </svg>
+                </button>
+              </div>
+              
+              <!-- 快速回复建议 -->
+              <div class="demo-quick-replies" v-if="demoMessages.length === 0 && !hasUsedDemo">
+                <button 
+                  v-for="suggestion in quickReplies" 
+                  :key="suggestion"
+                  @click="sendDemoMessage(suggestion)"
+                  class="quick-reply-btn"
+                >
+                  {{ suggestion }}
+                </button>
+              </div>
+              
+              <!-- 演示结束提示 -->
+              <div class="demo-end-notice" v-if="hasUsedDemo">
+                <p>🎉 演示体验完成！想要体验完整功能，请选择上方的AI助手开始使用。</p>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -160,47 +279,226 @@
   </div>
 </template>
 
-<script>
-export default {
-  name: 'Home',
-  mounted() {
-    // 设置页面特定的meta标签
-    this.updateMetaTags()
-  },
-  methods: {
-    updateMetaTags() {
-      // 更新页面标题
-      document.title = 'Hachimi Agent - 智能AI助手平台'
-      
-      // 更新或添加meta标签
-      this.updateMetaTag('description', 'Hachimi Agent是专业的AI智能助手平台，提供AI恋爱大师和AI超级智能体服务，帮助用户解决恋爱问题和处理各种智能任务')
-      this.updateMetaTag('keywords', 'AI助手,人工智能,聊天机器人,AI恋爱大师,智能体,恋爱咨询,智能任务处理')
-      
-      // 更新Open Graph标签
-      this.updateMetaProperty('og:title', 'Hachimi Agent - 智能AI助手平台')
-      this.updateMetaProperty('og:description', '专业的AI助手平台，提供恋爱咨询和智能任务处理服务')
-      this.updateMetaProperty('og:url', window.location.href)
-    },
-    
-    updateMetaTag(name, content) {
-      let meta = document.querySelector(`meta[name="${name}"]`)
-      if (!meta) {
-        meta = document.createElement('meta')
-        meta.name = name
-        document.head.appendChild(meta)
-      }
-      meta.content = content
-    },
-    
-    updateMetaProperty(property, content) {
-      let meta = document.querySelector(`meta[property="${property}"]`)
-      if (!meta) {
-        meta = document.createElement('meta')
-        meta.setAttribute('property', property)
-        document.head.appendChild(meta)
-      }
-      meta.content = content
-    }
+<script setup>
+import { ref, onMounted, nextTick } from 'vue'
+import { generateChatId } from '@/utils/chatService'
+
+// 对话示例相关
+const demoMessages = ref([])
+const demoInput = ref('')
+const isTyping = ref(false)
+const demoChatMessages = ref(null)
+const hasUsedDemo = ref(false) // 新增：标记是否已使用过演示
+
+// 快速回复建议
+const quickReplies = [
+  "你好，能介绍一下自己吗？",
+  "如何使用恋爱大师功能？", 
+  "AI超级智能体可以做什么？",
+  "你能帮我分析一下问题吗？"
+]
+
+// 预设回复库
+const aiResponses = {
+  "你好": "你好！我是Hachimi AI助手，很高兴为您服务！我可以帮您处理各种问题，包括恋爱咨询、任务分析等。",
+  "介绍": "我是Hachimi AI助手，集成了先进的人工智能技术。我有两个主要功能：恋爱大师和AI超级智能体。恋爱大师可以提供情感咨询，AI超级智能体可以帮您分析和处理复杂任务。",
+  "恋爱": "恋爱大师功能可以帮您：\\n• 分析感情问题\\n• 提供约会建议\\n• 改善沟通技巧\\n• 解决情感困惑\\n\\n点击恋爱大师卡片即可开始使用！",
+  "智能体": "AI超级智能体具有强大的分析能力：\\n• 分步骤分析复杂问题\\n• 提供详细解决方案\\n• 多维度思考问题\\n• 个性化建议\\n\\n点击AI超级智能体开始体验！",
+  "功能": "我的主要功能包括：\\n🎯 恋爱咨询：提供专业的情感建议\\n🧠 智能分析：分步骤解决复杂问题\\n💬 对话交互：自然流畅的交流体验\\n📱 跨平台：支持各种设备使用",
+  "帮助": "当然可以！我很乐意帮助您。请告诉我您遇到的具体问题，我会根据问题类型为您提供最合适的解决方案。您可以选择使用恋爱大师或AI超级智能体功能。"
+}
+
+// 生成粒子样式
+const getParticleStyle = (index) => {
+  const delay = Math.random() * 15
+  const duration = 15 + Math.random() * 20
+  const size = 1 + Math.random() * 3
+  const left = Math.random() * 100
+  
+  return {
+    left: `${left}%`,
+    animationDelay: `${delay}s`,
+    animationDuration: `${duration}s`,
+    width: `${size}px`,
+    height: `${size}px`
   }
 }
+
+// 生成流星样式
+const getMeteorStyle = (index) => {
+  const delay = Math.random() * 10 + index * 3
+  const duration = 3 + Math.random() * 2
+  const startX = Math.random() * 100
+  const startY = Math.random() * 50
+  
+  return {
+    left: `${startX}%`,
+    top: `${startY}%`,
+    animationDelay: `${delay}s`,
+    animationDuration: `${duration}s`
+  }
+}
+
+// 获取AI回复
+const getAIResponse = (userMessage) => {
+  const message = userMessage.toLowerCase()
+  
+  // 关键词匹配
+  for (const keyword in aiResponses) {
+    if (message.includes(keyword)) {
+      return aiResponses[keyword].replace(/\\n/g, '\n')
+    }
+  }
+  
+  // 默认回复
+  const defaultResponses = [
+    "这是一个很有趣的问题！让我来为您分析一下...",
+    "我理解您的想法。基于我的分析，我建议...",
+    "这个问题确实需要仔细考虑。从多个角度来看...",
+    "很好的问题！让我为您提供一些专业的建议..."
+  ]
+  
+  return defaultResponses[Math.floor(Math.random() * defaultResponses.length)]
+}
+
+// 发送示例消息
+const sendDemoMessage = (message = null) => {
+  // 检查是否已经使用过演示
+  if (hasUsedDemo.value) {
+    return
+  }
+
+  const text = message || demoInput.value.trim()
+  if (!text || isTyping.value) return
+  
+  // 标记已使用演示
+  hasUsedDemo.value = true
+  
+  // 添加用户消息
+  const userMessage = {
+    id: generateChatId(),
+    type: 'user',
+    text: text,
+    time: new Date().toLocaleTimeString('zh-CN', { 
+      hour: '2-digit', 
+      minute: '2-digit' 
+    })
+  }
+  
+  demoMessages.value.push(userMessage)
+  demoInput.value = ''
+  
+  // 滚动到底部
+  nextTick(() => {
+    if (demoChatMessages.value) {
+      demoChatMessages.value.scrollTop = demoChatMessages.value.scrollHeight
+    }
+  })
+  
+  // 模拟AI回复
+  isTyping.value = true
+  
+  setTimeout(() => {
+    const aiMessage = {
+      id: generateChatId(),
+      type: 'ai',
+      text: getAIResponse(text),
+      time: new Date().toLocaleTimeString('zh-CN', { 
+        hour: '2-digit', 
+        minute: '2-digit' 
+      })
+    }
+    
+    demoMessages.value.push(aiMessage)
+    isTyping.value = false
+    
+    // 添加演示结束提示
+    setTimeout(() => {
+      const endMessage = {
+        id: generateChatId(),
+        type: 'ai',
+        text: '💡 演示体验结束！想要更多功能请使用完整版AI助手。点击上方卡片开始您的AI之旅！',
+        time: new Date().toLocaleTimeString('zh-CN', { 
+          hour: '2-digit', 
+          minute: '2-digit' 
+        })
+      }
+      demoMessages.value.push(endMessage)
+      
+      // 再次滚动到底部
+      nextTick(() => {
+        if (demoChatMessages.value) {
+          demoChatMessages.value.scrollTop = demoChatMessages.value.scrollHeight
+        }
+      })
+    }, 1000)
+    
+    // 滚动到底部
+    nextTick(() => {
+      if (demoChatMessages.value) {
+        demoChatMessages.value.scrollTop = demoChatMessages.value.scrollHeight
+      }
+    })
+  }, 1500 + Math.random() * 2000) // 1.5-3.5秒随机延迟
+}
+
+// 清空对话
+const clearDemo = () => {
+  demoMessages.value = []
+  demoInput.value = ''
+  isTyping.value = false
+  hasUsedDemo.value = false // 重置使用状态
+}
+
+// SEO设置
+const updateMetaTags = () => {
+  document.title = 'Hachimi Agent - 智能AI助手平台'
+  
+  const updateMetaTag = (name, content) => {
+    let meta = document.querySelector(`meta[name="${name}"]`)
+    if (!meta) {
+      meta = document.createElement('meta')
+      meta.name = name
+      document.head.appendChild(meta)
+    }
+    meta.content = content
+  }
+  
+  const updateMetaProperty = (property, content) => {
+    let meta = document.querySelector(`meta[property="${property}"]`)
+    if (!meta) {
+      meta = document.createElement('meta')
+      meta.setAttribute('property', property)
+      document.head.appendChild(meta)
+    }
+    meta.content = content
+  }
+  
+  updateMetaTag('description', 'Hachimi Agent是专业的AI智能助手平台，提供AI恋爱大师和AI超级智能体服务，帮助用户解决恋爱问题和处理各种智能任务')
+  updateMetaTag('keywords', 'AI助手,人工智能,聊天机器人,AI恋爱大师,智能体,恋爱咨询,智能任务处理')
+  
+  updateMetaProperty('og:title', 'Hachimi Agent - 智能AI助手平台')
+  updateMetaProperty('og:description', '专业的AI助手平台，提供恋爱咨询和智能任务处理服务')
+  updateMetaProperty('og:url', window.location.href)
+}
+
+// 组件挂载
+onMounted(() => {
+  // 设置SEO标签
+  updateMetaTags()
+  
+  // 添加初始欢迎消息
+  setTimeout(() => {
+    const welcomeMessage = {
+      id: generateChatId(),
+      type: 'ai',
+      text: '欢迎使用Hachimi AI助手！我是您的智能伙伴，可以帮您解决各种问题。请随时向我提问！',
+      time: new Date().toLocaleTimeString('zh-CN', { 
+        hour: '2-digit', 
+        minute: '2-digit' 
+      })
+    }
+    demoMessages.value.push(welcomeMessage)
+  }, 800)
+})
 </script>

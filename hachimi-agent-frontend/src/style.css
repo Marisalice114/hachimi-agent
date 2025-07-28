@@ -312,6 +312,215 @@ body {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* 背景动画效果 */
+.background-effects {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* 浮动粒子动画 */
+.particles-container {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.particle {
+  position: absolute;
+  background: linear-gradient(45deg, rgba(25, 195, 125, 0.6), rgba(79, 70, 229, 0.4));
+  border-radius: 50%;
+  opacity: 0.4;
+  animation: float-up linear infinite;
+}
+
+@keyframes float-up {
+  0% {
+    transform: translateY(100vh) rotate(0deg);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.4;
+  }
+  90% {
+    opacity: 0.4;
+  }
+  100% {
+    transform: translateY(-100px) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+/* 渐变光晕 */
+.gradient-orbs {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+}
+
+.orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  animation: float-orb 20s ease-in-out infinite;
+  opacity: 0.4;
+}
+
+.orb-1 {
+  width: 400px;
+  height: 400px;
+  background: linear-gradient(45deg, rgba(25, 195, 125, 0.3), rgba(22, 160, 105, 0.2));
+  top: -10%;
+  left: -10%;
+  animation-delay: 0s;
+}
+
+.orb-2 {
+  width: 300px;
+  height: 300px;
+  background: linear-gradient(45deg, rgba(79, 70, 229, 0.25), rgba(6, 182, 212, 0.15));
+  top: 50%;
+  right: -10%;
+  animation-delay: 7s;
+}
+
+.orb-3 {
+  width: 350px;
+  height: 350px;
+  background: linear-gradient(45deg, rgba(139, 92, 246, 0.2), rgba(59, 130, 246, 0.15));
+  bottom: -10%;
+  left: 40%;
+  animation-delay: 14s;
+}
+
+.orb-4 {
+  width: 250px;
+  height: 250px;
+  background: linear-gradient(45deg, rgba(236, 72, 153, 0.15), rgba(245, 158, 11, 0.1));
+  top: 20%;
+  left: 60%;
+  animation-delay: 21s;
+}
+
+@keyframes float-orb {
+  0%, 100% {
+    transform: translateY(0px) scale(1) rotate(0deg);
+  }
+  33% {
+    transform: translateY(-20px) scale(1.05) rotate(120deg);
+  }
+  66% {
+    transform: translateY(10px) scale(0.95) rotate(240deg);
+  }
+}
+
+/* 网格背景 */
+.grid-background {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-image: 
+    linear-gradient(rgba(25, 195, 125, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(25, 195, 125, 0.03) 1px, transparent 1px);
+  background-size: 60px 60px;
+  animation: grid-move 30s linear infinite;
+}
+
+@keyframes grid-move {
+  0% {
+    transform: translate(0, 0);
+  }
+  100% {
+    transform: translate(60px, 60px);
+  }
+}
+
+/* 流星效果 */
+.meteors-container {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.meteor {
+  position: absolute;
+  width: 2px;
+  height: 80px;
+  background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.8), transparent);
+  border-radius: 50%;
+  animation: meteor-fall linear infinite;
+}
+
+@keyframes meteor-fall {
+  0% {
+    transform: translateX(-100px) translateY(-100px) rotate(45deg);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(100vw) translateY(100vh) rotate(45deg);
+    opacity: 0;
+  }
+}
+
+/* 脉冲波纹效果 */
+.pulse-waves {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.pulse-wave {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100px;
+  height: 100px;
+  border: 2px solid rgba(25, 195, 125, 0.3);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  animation: pulse-expand 4s ease-out infinite;
+}
+
+.pulse-wave-2 {
+  animation-delay: 1.3s;
+  border-color: rgba(79, 70, 229, 0.3);
+}
+
+.pulse-wave-3 {
+  animation-delay: 2.6s;
+  border-color: rgba(139, 92, 246, 0.3);
+}
+
+@keyframes pulse-expand {
+  0% {
+    width: 100px;
+    height: 100px;
+    opacity: 1;
+  }
+  100% {
+    width: 1000px;
+    height: 1000px;
+    opacity: 0;
+  }
 }
 
 .home-container {
@@ -409,6 +618,338 @@ body {
   font-size: 0.875rem;
   color: #8e8ea0;
   font-weight: 500;
+}
+
+/* 对话示例区域 */
+.demo-section {
+  width: 100%;
+  margin-bottom: 6rem;
+  padding: 0 1rem;
+}
+
+.chat-demo {
+  max-width: 800px;
+  margin: 3rem auto 0;
+  background: linear-gradient(135deg, rgba(26, 27, 35, 0.8), rgba(37, 37, 48, 0.6));
+  border-radius: 1rem;
+  overflow: hidden;
+  box-shadow: 
+    0 20px 60px rgba(0, 0, 0, 0.3),
+    0 0 0 1px rgba(25, 195, 125, 0.1);
+  border: 1px solid rgba(52, 53, 65, 0.6);
+  backdrop-filter: blur(20px);
+}
+
+.demo-chat-container {
+  height: 500px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 对话示例头部 */
+.demo-chat-header {
+  padding: 1rem 1.5rem;
+  background: linear-gradient(135deg, rgba(52, 53, 65, 0.8), rgba(64, 65, 79, 0.6));
+  border-bottom: 1px solid rgba(86, 88, 105, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  backdrop-filter: blur(10px);
+}
+
+.demo-header-info {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.demo-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #19c37d, #16a069);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  box-shadow: 0 4px 12px rgba(25, 195, 125, 0.3);
+}
+
+.demo-title h4 {
+  color: #ffffff;
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.demo-status {
+  color: #19c37d;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.demo-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.demo-clear-btn {
+  background: transparent;
+  border: 1px solid rgba(86, 88, 105, 0.6);
+  border-radius: 0.5rem;
+  padding: 0.5rem;
+  color: #8e8ea0;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.demo-clear-btn:hover {
+  background: rgba(86, 88, 105, 0.8);
+  color: #ffffff;
+  border-color: rgba(25, 195, 125, 0.5);
+}
+
+/* 对话消息区域 */
+.demo-chat-messages {
+  flex: 1;
+  padding: 1.5rem;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  background: rgba(15, 16, 17, 0.3);
+}
+
+.demo-message {
+  display: flex;
+  gap: 0.75rem;
+  animation: fadeInUp 0.4s ease;
+}
+
+.demo-message.user {
+  flex-direction: row-reverse;
+}
+
+.demo-message-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+.demo-message.user .demo-message-avatar {
+  background: linear-gradient(135deg, #4f46e5, #06b6d4);
+  box-shadow: 0 2px 8px rgba(79, 70, 229, 0.3);
+}
+
+.demo-message.ai .demo-message-avatar {
+  background: linear-gradient(135deg, #19c37d, #16a069);
+  box-shadow: 0 2px 8px rgba(25, 195, 125, 0.3);
+}
+
+.demo-message-content {
+  max-width: 70%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.demo-message.user .demo-message-content {
+  align-items: flex-end;
+}
+
+.demo-message-text {
+  background: rgba(52, 53, 65, 0.8);
+  padding: 0.75rem 1rem;
+  border-radius: 1rem;
+  color: #ffffff;
+  line-height: 1.5;
+  word-wrap: break-word;
+  white-space: pre-wrap;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(86, 88, 105, 0.3);
+}
+
+.demo-message.user .demo-message-text {
+  background: linear-gradient(135deg, rgba(79, 70, 229, 0.8), rgba(6, 182, 212, 0.6));
+  border-radius: 1rem 1rem 0.25rem 1rem;
+  border-color: rgba(79, 70, 229, 0.4);
+}
+
+.demo-message.ai .demo-message-text {
+  background: rgba(64, 65, 79, 0.8);
+  border-radius: 1rem 1rem 1rem 0.25rem;
+  border-color: rgba(25, 195, 125, 0.2);
+}
+
+.demo-message-time {
+  font-size: 0.75rem;
+  color: #8e8ea0;
+  padding: 0 0.5rem;
+}
+
+/* 正在输入动画 */
+.typing-indicator {
+  display: flex;
+  gap: 0.25rem;
+  padding: 1rem;
+  background: rgba(64, 65, 79, 0.8);
+  border-radius: 1rem 1rem 1rem 0.25rem;
+  backdrop-filter: blur(10px);
+}
+
+.typing-indicator span {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #8e8ea0;
+  animation: typing 1.4s infinite ease-in-out;
+}
+
+.typing-indicator span:nth-child(1) {
+  animation-delay: 0s;
+}
+
+.typing-indicator span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.typing-indicator span:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes typing {
+  0%, 60%, 100% {
+    transform: translateY(0);
+    opacity: 0.3;
+  }
+  30% {
+    transform: translateY(-10px);
+    opacity: 1;
+  }
+}
+
+/* 输入区域 */
+.demo-chat-input {
+  padding: 1.5rem;
+  background: rgba(26, 27, 35, 0.8);
+  border-top: 1px solid rgba(52, 53, 65, 0.6);
+  backdrop-filter: blur(10px);
+}
+
+.demo-input-wrapper {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-end;
+}
+
+.demo-input {
+  flex: 1;
+  background: rgba(64, 65, 79, 0.8);
+  border: 1px solid rgba(86, 88, 105, 0.6);
+  border-radius: 0.75rem;
+  padding: 0.75rem 1rem;
+  color: #ffffff;
+  font-size: 0.875rem;
+  resize: none;
+  outline: none;
+  transition: all 0.2s ease;
+  backdrop-filter: blur(10px);
+}
+
+.demo-input:focus {
+  border-color: #19c37d;
+  box-shadow: 0 0 0 3px rgba(25, 195, 125, 0.1);
+}
+
+.demo-input:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.demo-send-btn {
+  background: linear-gradient(135deg, #19c37d, #16a069);
+  border: none;
+  border-radius: 0.75rem;
+  padding: 0.75rem;
+  color: #ffffff;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(25, 195, 125, 0.3);
+}
+
+.demo-send-btn:hover:not(:disabled) {
+  transform: scale(1.05);
+  box-shadow: 0 6px 20px rgba(25, 195, 125, 0.4);
+}
+
+.demo-send-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* 快速回复 */
+.demo-quick-replies {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.quick-reply-btn {
+  background: transparent;
+  border: 1px solid rgba(86, 88, 105, 0.6);
+  border-radius: 1rem;
+  padding: 0.5rem 1rem;
+  color: #8e8ea0;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  backdrop-filter: blur(10px);
+}
+
+.quick-reply-btn:hover {
+  background: rgba(52, 53, 65, 0.8);
+  color: #ffffff;
+  border-color: rgba(25, 195, 125, 0.5);
+  transform: translateY(-1px);
+}
+
+/* 演示结束提示 */
+.demo-end-notice {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: linear-gradient(135deg, rgba(25, 195, 125, 0.1), rgba(22, 160, 105, 0.05));
+  border: 1px solid rgba(25, 195, 125, 0.3);
+  border-radius: 0.75rem;
+  text-align: center;
+  backdrop-filter: blur(10px);
+}
+
+.demo-end-notice p {
+  color: #19c37d;
+  font-size: 0.875rem;
+  font-weight: 500;
+  margin: 0;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* 功能区域 */
@@ -1081,4 +1622,145 @@ body {
   padding: clamp(1rem, 3vw, 1.25rem);
   border-top: 1px solid #343541;
   flex-shrink: 0;
+}
+
+/* 主页响应式样式 */
+@media (max-width: 768px) {
+  /* 移动端关闭复杂动画以提升性能 */
+  .background-effects .orb-1,
+  .background-effects .orb-2,
+  .background-effects .orb-3,
+  .background-effects .orb-4 {
+    display: none;
+  }
+  
+  .particles-container .particle {
+    display: none;
+  }
+  
+  .meteors-container {
+    display: none;
+  }
+  
+  .pulse-waves {
+    display: none;
+  }
+  
+  .grid-background {
+    animation: none;
+    opacity: 0.3;
+  }
+  
+  /* 对话示例区域移动端优化 */
+  .demo-section {
+    padding: 0;
+  }
+  
+  .chat-demo {
+    margin: 2rem 0 0;
+    border-radius: 0.75rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  }
+  
+  .demo-chat-container {
+    height: 400px;
+  }
+  
+  .demo-chat-header {
+    padding: 0.75rem 1rem;
+  }
+  
+  .demo-avatar {
+    width: 32px;
+    height: 32px;
+    font-size: 1rem;
+  }
+  
+  .demo-chat-messages {
+    padding: 1rem;
+    gap: 0.75rem;
+  }
+  
+  .demo-message-content {
+    max-width: 85%;
+  }
+  
+  .demo-message-text {
+    padding: 0.625rem 0.875rem;
+    font-size: 0.875rem;
+  }
+  
+  .demo-chat-input {
+    padding: 1rem;
+  }
+  
+  .demo-input {
+    font-size: 1rem; /* 防止iOS缩放 */
+    padding: 0.625rem 0.875rem;
+  }
+  
+  .demo-quick-replies {
+    gap: 0.375rem;
+    margin-top: 0.75rem;
+  }
+  
+  .quick-reply-btn {
+    padding: 0.375rem 0.75rem;
+    font-size: 0.8rem;
+  }
+  
+  /* Hero区域移动端优化 */
+  .hero-section {
+    padding: 2rem 0 3rem;
+  }
+  
+  .stats-section {
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    gap: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  /* 超小屏幕优化 */
+  .demo-chat-container {
+    height: 350px;
+  }
+  
+  .demo-message-content {
+    max-width: 90%;
+  }
+  
+  .demo-quick-replies {
+    flex-direction: column;
+  }
+  
+  .quick-reply-btn {
+    text-align: left;
+    width: 100%;
+    justify-content: flex-start;
+  }
+  
+  .stats-section {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  
+  .demo-input-wrapper {
+    gap: 0.5rem;
+  }
+  
+  .demo-send-btn {
+    padding: 0.625rem;
+  }
+}
+
+/* 高DPI屏幕优化 */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .particle {
+    animation-duration: 25s; /* 减慢动画以节省资源 */
+  }
+  
+  .orb {
+    filter: blur(60px); /* 减少模糊强度 */
+  }
 }
