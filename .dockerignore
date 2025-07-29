@@ -1,0 +1,69 @@
+# Docker 构建时忽略的文件和目录
+
+# 目标目录 - 修改这部分！
+# target/  # ❌ 不要完全排除 target 目录
+# */target/  # ❌ 这也会排除 JAR 文件
+
+# 只排除 target 中不需要的部分，保留 JAR 文件
+target/classes/
+target/test-classes/
+target/maven-status/
+target/maven-archiver/
+target/surefire-reports/
+target/generated-sources/
+target/generated-test-sources/
+
+# IDE 文件
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+
+# 源代码测试
+src/test/
+
+# 日志文件
+*.log
+logs/
+
+# 临时文件
+tmp/
+temp/
+*.tmp
+*.temp
+
+# 环境配置和敏感文件
+.env
+.env.local
+.env.production
+.env.staging
+
+# 排除敏感的配置文件
+src/main/resources/application-prod.yml
+src/main/resources/application-local.yml
+
+# Git 相关
+.git/
+.gitignore
+
+# 文档
+*.md
+docs/
+
+# 备份文件
+backup/
+*.bak
+
+# 前端
+hachimi-agent-frontend/
+
+# Docker 相关
+Dockerfilelocal
+docker-compose.yml
+.dockerignore
+
+# Maven wrapper（如果不需要）
+.mvn/
+mvnw
+mvnw.cmd

@@ -6,10 +6,18 @@ RUN apk add --no-cache tzdata && \
     cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && \
     echo "Asia/Shanghai" > /etc/timezone
 
+# 安装 Node.js 和 npm（包含 npx）
+RUN apk add --no-cache nodejs npm
+
+# 验证安装（可选但推荐）
+RUN echo "Node.js version: $(node -v)" && \
+    echo "npm version: $(npm -v)" && \
+    echo "npx version: $(npx -v)"
+
 WORKDIR /app
 
 # 复制已经打包好的 JAR 文件
-COPY target/hachimi-agent-0.0.1-SNAPSHOT.jar app.jar
+COPY hachimi-agent-0.0.1-SNAPSHOT.jar app.jar
 
 # 暴露端口
 EXPOSE 8123

@@ -46,7 +46,8 @@ spring:
         max-document-batch-size: 10000     # 批处理大小
     mcp:
       client:
-        request-timeout: 30s
+        enabled: true
+        request-timeout: 30s  # 请求超时时间，单位毫秒
         type: SYNC  # or ASYNC for reactive applications
         stdio:
           servers-configuration: classpath:mcp-servers.json
@@ -54,6 +55,13 @@ spring:
 #          connections:
 #            server1:
 #              url: http://localhost:910
+  sql:
+    init:
+      mode: always                          # 总是执行初始化
+      schema-locations: classpath:sql/schema.sql
+      encoding: utf-8
+      separator: ;
+      continue-on-error: false
 
 
 
