@@ -29,10 +29,11 @@ public class LoveAppVectorStoreConfig {
     @Resource
     private MyKeyWordEnricher myKeyWordEnricher;
 
+
     @Bean("loveAppVectorStore")
     @Lazy
-    public VectorStore loveAppVectorStore(@Qualifier("ollamaEmbeddingModel") EmbeddingModel ollamaEmbeddingModel) {
-        SimpleVectorStore simpleVectorStore = SimpleVectorStore.builder(ollamaEmbeddingModel).build();
+    public VectorStore loveAppVectorStore(EmbeddingModel embeddingModel) {
+        SimpleVectorStore simpleVectorStore = SimpleVectorStore.builder(embeddingModel).build();
         List<Document> documents = loveAppMarkdownReader.LoadMarkdownDocuments();
         //自定义文档切分
         List<Document> splitDocuments = myTokenTextSplitter.splitCustomized(documents);

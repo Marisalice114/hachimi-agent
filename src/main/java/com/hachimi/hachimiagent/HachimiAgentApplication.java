@@ -1,13 +1,14 @@
 package com.hachimi.hachimiagent;
 
-import org.springframework.ai.tool.ToolCallbackProvider;
+
+import com.alibaba.cloud.ai.autoconfigure.dashscope.DashScopeEmbeddingAutoConfiguration;
+import org.springframework.ai.model.ollama.autoconfigure.OllamaEmbeddingAutoConfiguration;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.Bean;
 
 
-@SpringBootApplication(exclude = {
-})
+
+@SpringBootApplication(scanBasePackages = "com.hachimi.hachimiagent",exclude = {DashScopeEmbeddingAutoConfiguration.class, OllamaEmbeddingAutoConfiguration.class})
 public class HachimiAgentApplication {
 
     public static void main(String[] args) {

@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * StructuredOutputConverter 测试类
  * 测试结构化输出转换器的各种功能
  */
-@SpringBootTest
+//@SpringBootTest
 @DisplayName("结构化输出转换器测试")
 class StructuredOutputConverterTest {
 

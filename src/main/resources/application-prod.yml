@@ -1,0 +1,63 @@
+# 编写生产环境配置，覆盖application.yml中的配置
+
+# Docker生产环境配置
+spring:
+  config:
+    import: "optional:file:.env[.properties]"
+  datasource:
+    # MySQL 主数据源 - 使用环境变量或Docker网络
+    url: jdbc:mysql://${MYSQL_HOST}:${MYSQL_PORT}/${MYSQL_DATABASE}?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: ${MYSQL_USERNAME}
+    password: ${MYSQL_PASSWORD}
+    type: com.alibaba.druid.pool.DruidDataSource
+
+    # PostgreSQL 向量数据源 - 保持云数据库连接
+    vector:
+      url: jdbc:postgresql://${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DATABASE}
+      driver-class-name: org.postgresql.Driver
+      username: ${POSTGRES_USERNAME}
+      password: ${POSTGRES_PASSWORD}
+      type: com.alibaba.druid.pool.DruidDataSource
+
+  ai:
+    openai:
+      api-key: ${SILICONFLOW_API_KEY}
+      base-url: ${SILICONFLOW_BASE_URL:https://api.siliconflow.cn}
+      embedding:
+        enabled: true
+        options:
+          model: netease-youdao/bce-embedding-base_v1
+    dashscope:
+      api-key: ${ALI_API_KEY}
+      base-url: ${DASH_SCOPE_BASE_URL:https://dashscope.aliyuncs.com/compatible-mode/v1}
+      chat:
+        options:
+          model: ${AI_CHAT_MODEL:qwen-plus}
+      multimodal:
+        options:
+          model: ${AI_MULTIMODAL_MODEL:qwen-vl-plus}
+
+    ollama:
+      base-url: ${OLLAMA_BASE_URL:http://ollama:11434}
+      chat:
+        model: ${OLLAMA_MODEL:qwen3:0.6b}
+
+    baidu:
+      translation:
+        app-id: ${BAIDU_APP_ID}
+        app-secret: ${BAIDU_APP_SECRET}
+
+search-api:
+  api-key: ${SEARCH_API_KEY}
+
+# 服务器配置
+server:
+  port: ${SERVER_PORT:8123}
+
+# 日志配置
+logging:
+  level:
+    com.hachimi: ${LOG_LEVEL:INFO}
+    org.springframework: WARN
+    org.hibernate: WARN

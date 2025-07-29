@@ -1,6 +1,7 @@
 package com.hachimi.hachimiagent.configuration;
 
 
+
 import com.hachimi.hachimiagent.ETL.MyKeyWordEnricher;
 import com.hachimi.hachimiagent.ETL.MyTokenTextSplitter;
 import com.hachimi.hachimiagent.rag.LoveAppMarkdownReader;
@@ -8,7 +9,6 @@ import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.embedding.EmbeddingModel;
-import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.ai.vectorstore.pgvector.PgVectorStore;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -34,10 +34,12 @@ public class PGVectorVectorConfig {
     @Resource
     private MyKeyWordEnricher myKeyWordEnricher;
 
+
     @Bean
     public VectorStore pgVectorVectorStore(@Qualifier("vectorJdbcTemplate")JdbcTemplate vectorJdbcTemplate,
-                                           @Qualifier("ollamaEmbeddingModel") EmbeddingModel ollamaEmbeddingModel) {
-        PgVectorStore pgVectorStore = PgVectorStore.builder(vectorJdbcTemplate, ollamaEmbeddingModel)
+                                           EmbeddingModel embeddingModel) {
+        log.info("🚀 使用的EmbeddingModel类型: {}", embeddingModel.getClass().getName());
+        PgVectorStore pgVectorStore = PgVectorStore.builder(vectorJdbcTemplate, embeddingModel)
                 .distanceType(COSINE_DISTANCE)
                 .indexType(HNSW)
                 .initializeSchema(true)

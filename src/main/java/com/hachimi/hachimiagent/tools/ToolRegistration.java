@@ -7,6 +7,7 @@ import org.springframework.ai.tool.ToolCallback;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.util.StringUtils;
 
 /**
  * 集中工具注册
@@ -20,21 +21,34 @@ public class ToolRegistration {
     @Bean
     public ToolCallback[] allTools() {
         FileOperationTool fileOperationTool = new FileOperationTool();
-        WebSearchTool webSearchTool = new WebSearchTool(searchApiKey);
         WebScrapingTool webScrapingTool = new WebScrapingTool();
         ResourceDownloadTool resourceDownloadTool = new ResourceDownloadTool();
         TerminalOperationTool terminalOperationTool = new TerminalOperationTool();
         TerminateTool terminateTool = new TerminateTool();
         PDFGenerationTool pdfGenerationTool = new PDFGenerationTool();
-        return ToolCallbacks.from(
-                fileOperationTool,
-                webSearchTool,
-                webScrapingTool,
-                resourceDownloadTool,
-                terminalOperationTool,
-                terminateTool,
-                pdfGenerationTool
-        );
+
+        // 只有当API密钥可用时才创建WebSearchTool
+        if (StringUtils.hasText(searchApiKey)) {
+            WebSearchTool webSearchTool = new WebSearchTool(searchApiKey);
+            return ToolCallbacks.from(
+                    fileOperationTool,
+                    webSearchTool,
+                    webScrapingTool,
+                    resourceDownloadTool,
+                    terminalOperationTool,
+                    terminateTool,
+                    pdfGenerationTool
+            );
+        } else {
+            // 如果没有API密钥，就不包含WebSearchTool
+            return ToolCallbacks.from(
+                    fileOperationTool,
+                    webScrapingTool,
+                    resourceDownloadTool,
+                    terminalOperationTool,
+                    terminateTool,
+                    pdfGenerationTool
+            );
+        }
     }
 }
-

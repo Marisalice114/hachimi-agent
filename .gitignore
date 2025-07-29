@@ -1,44 +1,80 @@
-### CUSTOM ###
-application-local.yml
-tmp
-GEMINI.md
-echo
-项目结构.md
-backup
-mcp-servers.json
+# ==========================================
+# 敏感信息和环境配置
+# ==========================================
+.env
+.env.local
+.env.production
+.env.staging
 
-
-
-HELP.md
-target/
-.mvn/wrapper/maven-wrapper.jar
-!**/src/main/**/target/
-!**/src/test/**/target/
-
-### STS ###
-.apt_generated
-.classpath
-.factorypath
-.project
-.settings
-.springBeans
-.sts4-cache
-
-### IntelliJ IDEA ###
-.idea
-*.iws
+# ==========================================
+# IDE 和编辑器
+# ==========================================
+.idea/
+.vscode/
 *.iml
 *.ipr
+*.iws
+.project
+.classpath
+.settings/
 
-### NetBeans ###
-/nbproject/private/
-/nbbuild/
-/dist/
-/nbdist/
-/.nb-gradle/
-build/
-!**/src/main/**/build/
-!**/src/test/**/build/
+# ==========================================
+# Maven 构建产物
+# ==========================================
+target/
+*/target/
+.mvn/wrapper/maven-wrapper.jar
 
-### VS Code ###
-.vscode/
+# ==========================================
+# 日志文件
+# ==========================================
+*.log
+logs/
+log/
+
+# ==========================================
+# 临时文件和缓存
+# ==========================================
+tmp/
+temp/
+*.tmp
+*.temp
+.cache/
+
+# ==========================================
+# 操作系统文件
+# ==========================================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# ==========================================
+# Docker 相关
+# ==========================================
+.docker/
+docker-data/
+
+# ==========================================
+# 备份文件
+# ==========================================
+backup/
+*.bak
+*.backup
+
+# ==========================================
+# 数据库文件
+# ==========================================
+*.db
+*.sqlite
+*.sqlite3
+
+# ==========================================
+# 其他敏感文件
+# ==========================================
+secrets.txt
+config.properties
+src/main/resources/application-local.yml

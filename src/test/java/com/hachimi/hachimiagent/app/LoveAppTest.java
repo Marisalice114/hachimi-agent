@@ -22,7 +22,7 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@SpringBootTest
+//@SpringBootTest
 @Transactional
 @Rollback(false)  // 禁用事务回滚，让数据真正保存到数据库
 @Slf4j

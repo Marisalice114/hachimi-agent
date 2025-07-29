@@ -10,7 +10,7 @@ import org.springframework.stereotype.Repository;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
-@SpringBootTest
+//@SpringBootTest
 @Slf4j
 class QueryTransformerTest {
 

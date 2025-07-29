@@ -1,0 +1,86 @@
+version: '3.8'
+
+services:
+  # 主应用服务
+  hachimi-agent:
+    build: .
+    container_name: hachimi-agent
+    ports:
+      - "8123:8123"
+    environment:
+      # 数据库配置 - 全部使用环境变量
+      - MYSQL_HOST=mysql
+      - MYSQL_PORT=3306
+      - MYSQL_DATABASE=${MYSQL_DATABASE:-hachimi_agent}
+      - MYSQL_USERNAME=${MYSQL_USERNAME:-root}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+
+      # PostgreSQL 配置
+      - POSTGRES_HOST=${POSTGRES_HOST:-rm-cn-w5g4cx7e400027ao.rwlb.rds.aliyuncs.com}
+      - POSTGRES_PORT=${POSTGRES_PORT:-5432}
+      - POSTGRES_DATABASE=${POSTGRES_DATABASE:-hachimi_agent}
+      - POSTGRES_USERNAME=${POSTGRES_USERNAME}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+
+      # AI 服务配置 - 必须通过环境变量提供
+      - ALI_API_KEY=${ALI_API_KEY}
+      - DASH_SCOPE_BASE_URL=${DASH_SCOPE_BASE_URL:-https://dashscope.aliyuncs.com/compatible-mode/v1}
+      - OLLAMA_BASE_URL=http://ollama:11434
+      - AI_CHAT_MODEL=${AI_CHAT_MODEL:-qwen-plus}
+      - AI_MULTIMODAL_MODEL=${AI_MULTIMODAL_MODEL:-qwen-vl-plus}
+      - OLLAMA_MODEL=${OLLAMA_MODEL:-qwen3:0.6b}
+
+      # 其他 API 配置 - 移除默认值
+      - SEARCH_API_KEY=${SEARCH_API_KEY}
+      - BAIDU_APP_ID=${BAIDU_APP_ID}
+      - BAIDU_APP_SECRET=${BAIDU_APP_SECRET}
+
+      # 日志级别
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+    volumes:
+      - ./tmp:/app/tmp
+    depends_on:
+      - mysql
+      - ollama
+    networks:
+      - hachimi-network
+    restart: unless-stopped
+
+  # MySQL 数据库
+  mysql:
+    image: mysql:8.0
+    container_name: hachimi-mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_PASSWORD}
+      - MYSQL_DATABASE=${MYSQL_DATABASE:-hachimi_agent}
+      - MYSQL_CHARACTER_SET_SERVER=utf8mb4
+      - MYSQL_COLLATION_SERVER=utf8mb4_unicode_ci
+    # 移除端口暴露，只允许内部网络访问
+    # ports:
+    #   - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./sql:/docker-entrypoint-initdb.d
+    networks:
+      - hachimi-network
+    restart: unless-stopped
+
+  # Ollama AI 服务
+  ollama:
+    image: ollama/ollama:latest
+    container_name: hachimi-ollama
+    # 只在需要外部访问时才暴露端口
+    # ports:
+    #   - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    networks:
+      - hachimi-network
+
+networks:
+  hachimi-network:
+    driver: bridge
+
+volumes:
+  mysql_data:
+  ollama_data:

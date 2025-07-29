@@ -2,7 +2,6 @@ package com.hachimi.hachimiagent.service;
 
 import com.hachimi.hachimiagent.chatmemory.MysqlBasedChatMemoryRepository;
 import com.hachimi.hachimiagent.entity.ChatMessage;
-import com.hachimi.hachimiagent.mapper.ChatConversationMapper;
 import com.hachimi.hachimiagent.mapper.ChatMessageMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -16,7 +15,7 @@ import java.util.stream.Collectors;
 
 /**
  * 基于现有数据库ChatMemory体系的聊天历史服务
- * 直接使用Entity，基于您的实际数据库结构
+ * 直接使用Entity，无需DTO转换
  */
 @Service
 @Slf4j
@@ -28,12 +27,9 @@ public class ChatHistoryService {
     @Resource
     private ChatMessageMapper messageMapper;
 
-    @Resource
-    private ChatConversationMapper conversationMapper;
-
     /**
      * 获取所有会话列表
-     * 返回会话摘要信息的Map列表
+     * 返回会话基本信息的Map
      */
     public List<Map<String, Object>> getAllSessions() {
         try {
@@ -97,7 +93,6 @@ public class ChatHistoryService {
 
     /**
      * 构建会话摘要信息
-     * 基于您的实际Entity字段结构
      */
     private Map<String, Object> buildSessionSummary(String conversationId) {
         try {
@@ -108,22 +103,18 @@ public class ChatHistoryService {
                 return null;
             }
 
-            // 获取最后一条消息（按messageOrder排序后的最后一条）
+            // 获取最后一条消息
             ChatMessage lastMessage = messages.get(messages.size() - 1);
 
-            // 生成默认会话名称（基于第一条用户消息）
+            // 生成默认会话名称
             String sessionName = generateDefaultSessionName(messages);
 
-            // 构建会话摘要Map
             Map<String, Object> sessionSummary = new HashMap<>();
             sessionSummary.put("sessionId", conversationId);
             sessionSummary.put("sessionName", sessionName);
             sessionSummary.put("lastMessageTime", lastMessage.getCreateTime());
-            sessionSummary.put("lastMessage", truncateContent(lastMessage.getContent()));
+            sessionSummary.put("lastMessage", lastMessage.getContent());
             sessionSummary.put("messageCount", messages.size());
-
-            // 添加额外的元数据
-            sessionSummary.put("lastMessageType", lastMessage.getMessageType());
 
             return sessionSummary;
 
@@ -135,53 +126,39 @@ public class ChatHistoryService {
 
     /**
      * 生成默认会话名称
-     * 基于第一条用户消息的内容
      */
+    // 更稳健的解决方案：兼容大小写
     private String generateDefaultSessionName(List<ChatMessage> messages) {
-        // 查找第一条用户消息（messageType = "USER" 或 "user"）
+        // 查找第一条用户消息 - 兼容大小写
         ChatMessage firstUserMessage = messages.stream()
-                .filter(msg -> "USER".equalsIgnoreCase(msg.getMessageType()) || "user".equalsIgnoreCase(msg.getMessageType()))
+                .filter(msg -> msg.getMessageType() != null &&
+                        msg.getMessageType().toUpperCase().equals("USER"))  // ✅ 兼容大小写
                 .findFirst()
                 .orElse(null);
 
         if (firstUserMessage != null && firstUserMessage.getContent() != null) {
             String content = firstUserMessage.getContent().trim();
-            if (content.length() <= 15) {
+
+            // 清理内容
+            content = content.replaceAll("\\s+", " ")  // 多个空格合并为单个
+                    .replaceAll("[\\r\\n]+", "")  // 移除换行符
+                    .trim();
+
+            if (content.isEmpty()) {
+                return "新对话";
+            }
+
+            // 适当增加长度限制
+            int maxLength = 15;
+
+            if (content.length() <= maxLength) {
                 return content;
             } else {
-                return content.substring(0, 15) + "...";
-            }
-        }
-
-        // 如果没有用户消息，使用第一条消息
-        if (!messages.isEmpty()) {
-            ChatMessage firstMessage = messages.get(0);
-            if (firstMessage.getContent() != null) {
-                String content = firstMessage.getContent().trim();
-                if (content.length() <= 15) {
-                    return content;
-                } else {
-                    return content.substring(0, 15) + "...";
-                }
+                return content.substring(0, maxLength) + "...";
             }
         }
 
         return "新对话";
     }
-
-    /**
-     * 截断消息内容用于预览
-     */
-    private String truncateContent(String content) {
-        if (content == null || content.trim().isEmpty()) {
-            return "...";
-        }
-
-        String trimmed = content.trim();
-        if (trimmed.length() <= 50) {
-            return trimmed;
-        } else {
-            return trimmed.substring(0, 50) + "...";
-        }
-    }
 }
+

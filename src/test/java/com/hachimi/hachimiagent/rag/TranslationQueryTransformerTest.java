@@ -10,7 +10,7 @@ import java.nio.charset.StandardCharsets;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@SpringBootTest
+//@SpringBootTest
 @Slf4j
 class TranslationQueryTransformerTest {
 

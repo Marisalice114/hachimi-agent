@@ -263,6 +263,10 @@ export default {
     async sendMessage() {
       if (!this.inputMessage.trim() || this.isLoading) return
       
+      const isNewChat = !this.sessions.some(
+        s => (s.sessionId || s.conversationId || s.id) === this.currentChatId
+      );
+
       const message = this.inputMessage.trim()
       this.inputMessage = ''
       
@@ -274,6 +278,18 @@ export default {
         timestamp: new Date()
       })
       
+      if (isNewChat) {
+        const snippet = message.length > 20 ? message.substring(0, 20) + '...' : message;
+        chatHistoryService.setCustomSessionName(this.currentChatId, snippet);
+        
+        // Add the new session to the list for immediate UI update
+        this.sessions.unshift({
+          id: this.currentChatId,
+          sessionId: this.currentChatId,
+          conversationId: this.currentChatId,
+        });
+      }
+
       this.scrollToBottom()
       this.isLoading = true
       this.isTyping = true

@@ -9,7 +9,6 @@ spring:
     url: jdbc:mysql://localhost:3306/hachimi_agent?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: root
-    password: 123456
     # Druid 连接池配置
     initial-size: 5
     min-idle: 5
@@ -28,38 +27,23 @@ spring:
     vector:
       url: jdbc:postgresql://rm-cn-w5g4cx7e400027ao.rwlb.rds.aliyuncs.com:5432/hachimi_agent
       driver-class-name: org.postgresql.Driver
-      username: 19983136688
-      password: Zh810271689
-  #      # Druid 连接池配置
-  #      initial-size: 3
-  #      min-idle: 3
-  #      max-active: 10
-  #      max-wait: 60000
-  #      time-between-eviction-runs-millis: 60000
-  #      min-evictable-idle-time-millis: 300000
-  #      validation-query: SELECT 1
-  #      test-while-idle: true
-  #      test-on-borrow: false
-  #      test-on-return: false
-  #      pool-prepared-statements: true
-  #      max-pool-prepared-statement-per-connection-size: 20
-
   ai:
+    dashscope:
+      embedding:
+        enabled: false
     ollama:
       base-url: http://localhost:11434
       chat:
         model: qwen3:0.6b
       embedding:
-        model: nomic-embed-text:latest
+        enbaled: false
+
+
     vectorstore:
       pgvector:
         index-type: HNSW                    # 向量索引类型
         distance-type: COSINE_DISTANCE     # 距离计算方式
         max-document-batch-size: 10000     # 批处理大小
-    baidu:
-      translation:
-        app-id: 20201128000628785
-        app-secret: SId_xkccAlBR6D5an3vi
     mcp:
       client:
         request-timeout: 30s
@@ -70,7 +54,6 @@ spring:
 #          connections:
 #            server1:
 #              url: http://localhost:910
-
 
 
 
@@ -90,18 +73,27 @@ mybatis-plus:
   type-aliases-package: com.hachimi.hachimiagent.entity
 
 # 日志配置
+#logging:
+#  level:
+#    com.hachimi.hachimiagent: INFO
+#    com.hachimi.hachimiagent.mapper: INFO
+#    org.springframework.ai: INFO
+#    com.hachimi.hachimiagent.rag.TranslationQueryTransformer: DEBUG
 logging:
   level:
-    com.hachimi.hachimiagent: INFO
-    com.hachimi.hachimiagent.mapper: INFO
-    org.springframework.ai: INFO
-    com.hachimi.hachimiagent.rag.TranslationQueryTransformer: DEBUG
+    org.springframework.ai: DEBUG
+    org.springframework.ai.openai: DEBUG
+    org.springframework.web.client: DEBUG
 
 server:
   port: 8123
   servlet:
     #访问路径前缀
-      context-path: /api
+    context-path: /api
+
+# 搜索API配置
+search-api:
+  api-key:
 
 # springdoc-openapi项目配置
 springdoc:
