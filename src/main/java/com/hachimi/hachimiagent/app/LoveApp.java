@@ -50,7 +50,6 @@ public class LoveApp {
      * Spring 在调用此构造函数之前，会确保所有参数（Bean）都已创建完毕。
      * @param dashscopeChatModel 核心聊天模型
      * @param mysqlBasedChatMemoryRepository 数据库聊天记录仓库
-     * @param loveAppVectorStore 本地向量存储
      * @param loveAppRagCloudAdvisor 阿里云知识库顾问 (使用 @Qualifier 精确指定Bean名称)
      */
     public LoveApp(ChatModel dashscopeChatModel,
@@ -239,14 +238,6 @@ public class LoveApp {
     //AI调用MCP
     @Resource
     private ToolCallbackProvider toolCallbackProvider;
-
-//    // 同步客户端
-//    @Resource
-//    private List<McpSyncClient> mcpSyncClients;
-//
-//    // 异步客户端
-//    @Resource
-//    private List<McpAsyncClient> mcpAsyncClients;
 
 
     public String doChatWithMCP(String userMessage, String chatId) {

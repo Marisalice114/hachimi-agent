@@ -6,43 +6,45 @@ public class ResultUtils {
 
     /**
      * 成功
-     *
-     * @param data 数据
-     * @param <T>  数据类型
-     * @return 响应
      */
     public static <T> BaseResponse<T> success(T data) {
         return new BaseResponse<>(0, data, "ok");
     }
 
     /**
-     * 失败
-     *
-     * @param errorCode 错误码
-     * @return 响应
+     * 成功(无数据)
      */
-    public static BaseResponse<?> error(ErrorCode errorCode) {
-        return new BaseResponse<>(errorCode);
+    public static <T> BaseResponse<T> success() {
+        return new BaseResponse<>(0, null, "ok");
     }
 
     /**
-     * 失败
-     *
-     * @param code    错误码
-     * @param message 错误信息
-     * @return 响应
+     * 成功(自定义消息)
      */
-    public static BaseResponse<?> error(int code, String message) {
+    public static <T> BaseResponse<T> success(T data, String message) {
+        return new BaseResponse<>(0, data, message);
+    }
+
+    // =================== 错误处理 ===================
+
+    /**
+     * 失败 - 使用 ErrorCode
+     */
+    public static <T> BaseResponse<T> error(ErrorCode errorCode) {
+        return new BaseResponse<>(errorCode.getCode(), null, errorCode.getMessage());
+    }
+
+    /**
+     * 失败 - 使用 code + message
+     */
+    public static <T> BaseResponse<T> error(int code, String message) {
         return new BaseResponse<>(code, null, message);
     }
 
     /**
-     * 失败
-     *
-     * @param errorCode 错误码
-     * @return 响应
+     * 失败 - 默认错误码 500
      */
-    public static BaseResponse<?> error(ErrorCode errorCode, String message) {
-        return new BaseResponse<>(errorCode.getCode(), null, message);
+    public static <T> BaseResponse<T> error(String message) {
+        return new BaseResponse<>(500, null, message);
     }
 }

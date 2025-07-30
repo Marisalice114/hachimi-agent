@@ -25,7 +25,7 @@ spring:
 
     # 向量数据源 - PostgreSQL (RAG知识库)
     vector:
-      url: jdbc:postgresql://rm-cn-w5g4cx7e400027ao.rwlb.rds.aliyuncs.com:5432/hachimi_agent
+      url: jdbc:postgresql://pgm-bp1e8qd11rjy5uq9bo.rwlb.rds.aliyuncs.com:5432/hachimi_agent
       driver-class-name: org.postgresql.Driver
   ai:
     dashscope:
@@ -41,13 +41,13 @@ spring:
 
     vectorstore:
       pgvector:
-        index-type: HNSW                    # 向量索引类型
+        index-type: IVFFlat                # 向量索引类型
         distance-type: COSINE_DISTANCE     # 距离计算方式
         max-document-batch-size: 10000     # 批处理大小
     mcp:
       client:
         enabled: true
-        request-timeout: 30s  # 请求超时时间，单位毫秒
+        request-timeout: 30s
         type: SYNC  # or ASYNC for reactive applications
         stdio:
           servers-configuration: classpath:mcp-servers.json

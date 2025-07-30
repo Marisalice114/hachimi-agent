@@ -1,11 +1,22 @@
+// src/utils/chatHistoryService.js
 import Cookies from 'js-cookie'
+
+// 获取API基础URL（与api.js保持一致）
+const getApiBaseURL = () => {
+  if (import.meta.env.DEV) {
+    return import.meta.env.VITE_API_BASE_URL || 'http://localhost:8123/api'
+  }
+  return import.meta.env.VITE_API_BASE_URL || '/api'
+}
 
 export const chatHistoryService = {
   // 获取所有会话
   async getAllSessions() {
     try {
-      console.log('准备请求会话列表: /api/chat/sessions')
-      const response = await fetch('/api/chat/sessions')
+      const apiUrl = `${getApiBaseURL()}/chat/sessions`
+      console.log('准备请求会话列表:', apiUrl)
+      
+      const response = await fetch(apiUrl)
       console.log('会话列表响应状态:', response.status, response.statusText)
       
       if (response.ok) {
@@ -27,8 +38,10 @@ export const chatHistoryService = {
   // 获取指定会话的消息
   async getSessionMessages(sessionId) {
     try {
-      console.log('准备请求会话消息: /api/chat/sessions/' + sessionId + '/messages')
-      const response = await fetch(`/api/chat/sessions/${sessionId}/messages`)
+      const apiUrl = `${getApiBaseURL()}/chat/sessions/${sessionId}/messages`
+      console.log('准备请求会话消息:', apiUrl)
+      
+      const response = await fetch(apiUrl)
       if (response.ok) {
         const data = await response.json()
         console.log('获取到的消息数据:', data)
@@ -46,7 +59,8 @@ export const chatHistoryService = {
   // 获取会话信息
   async getSession(sessionId) {
     try {
-      const response = await fetch(`/api/chat/sessions/${sessionId}`)
+      const apiUrl = `${getApiBaseURL()}/chat/sessions/${sessionId}`
+      const response = await fetch(apiUrl)
       return await response.json()
     } catch (error) {
       console.error('获取会话信息失败:', error)
@@ -90,7 +104,8 @@ export const chatHistoryService = {
   // 删除会话
   async deleteSession(sessionId) {
     try {
-      await fetch(`/api/chat/sessions/${sessionId}`, {
+      const apiUrl = `${getApiBaseURL()}/chat/sessions/${sessionId}`
+      await fetch(apiUrl, {
         method: 'DELETE'
       })
       // 同时删除自定义名称

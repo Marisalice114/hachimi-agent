@@ -2,102 +2,51 @@ package com.hachimi.hachimiagent.advisor;
 
 
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.springframework.ai.chat.client.ChatClientMessageAggregator;
 import org.springframework.ai.chat.client.ChatClientRequest;
 import org.springframework.ai.chat.client.ChatClientResponse;
 import org.springframework.ai.chat.client.advisor.api.CallAdvisor;
 import org.springframework.ai.chat.client.advisor.api.CallAdvisorChain;
 import org.springframework.ai.chat.client.advisor.api.StreamAdvisor;
 import org.springframework.ai.chat.client.advisor.api.StreamAdvisorChain;
-import org.springframework.ai.chat.messages.Message;
 import reactor.core.publisher.Flux;
 
 
 @Slf4j
 public class SelfLogAdvisor implements CallAdvisor, StreamAdvisor {
 
-
-    @Override
-    public ChatClientResponse adviseCall(ChatClientRequest chatClientRequest, CallAdvisorChain callAdvisorChain) {
-
-        log.info("User: {}", extractLastUserMessage(chatClientRequest));
-
-        //调用下一个advisor前后对比
-        log.info("🔄 [SelfLogAdvisor] 调用下一个advisor...");
-        ChatClientResponse response = callAdvisorChain.nextCall(chatClientRequest);
-        log.info("🔄 [SelfLogAdvisor] advisor链调用完成");
-
-        log.info("AI: {}", extractAIContent(response));
-        return response;
-    }
-
-    @Override
-    public Flux<ChatClientResponse> adviseStream(ChatClientRequest chatClientRequest, StreamAdvisorChain streamAdvisorChain) {
-        log.info("User: {}", extractLastUserMessage(chatClientRequest));
-
-        return streamAdvisorChain.nextStream(chatClientRequest)
-                .doOnNext(response -> {
-                    String content = extractAIContent(response);
-                    if (content != null && !content.trim().isEmpty()) {
-                        log.info("Stream: {}", content);
-                    }
-                });
-    }
-
-    private String extractLastUserMessage(ChatClientRequest request) {
-        try {
-            // 简单的字符串提取，寻找最后一个UserMessage
-            String fullRequest = request.toString();
-            int lastUserIndex = fullRequest.lastIndexOf("UserMessage{content='");
-            if (lastUserIndex != -1) {
-                int startIndex = lastUserIndex + "UserMessage{content='".length();
-                int endIndex = fullRequest.indexOf("'", startIndex);
-                if (endIndex != -1) {
-                    return fullRequest.substring(startIndex, endIndex);
-                }
-            }
-            return "Unable to extract user message";
-        } catch (Exception e) {
-            return "Error extracting user message";
-        }
-    }
-
-    private String extractAIContent(ChatClientResponse response) {
-        try {
-            if (response.chatResponse() != null) {
-                //从字符串中精确提取 textContent
-                String responseStr = response.chatResponse().toString();
-                log.debug("Full response string: {}", responseStr);
-
-                // 查找 textContent=
-                String pattern = "textContent=";
-                int textContentIndex = responseStr.indexOf(pattern);
-                if (textContentIndex != -1) {
-                    int startIndex = textContentIndex + pattern.length();
-                    int endIndex = responseStr.indexOf(", metadata=", startIndex);
-                    if (endIndex != -1) {
-                        return responseStr.substring(startIndex, endIndex);
-                    }
-                }
-
-                return "Unable to extract textContent from response";
-            }
-            return null;
-        } catch (Exception e) {
-            log.warn("Error extracting AI content: {}", e.getMessage());
-            return "Error extracting AI content: " + e.getMessage();
-        }
-    }
-
-
     @Override
     public String getName() {
-        return "SelfLogAdvisor";
+        return this.getClass().getSimpleName();
     }
 
     @Override
     public int getOrder() {
         return 1000;
+    }
+
+    //仿照老api的before和after方法，便于观察
+    private ChatClientRequest before(ChatClientRequest request) {
+        log.info("AI Request: {}", request.prompt());
+        return request;
+    }
+
+    private void observeAfter(ChatClientResponse chatClientResponse) {
+        log.info("AI Response: {}", chatClientResponse.chatResponse().getResult().getOutput().getText());
+    }
+
+    @Override
+    public ChatClientResponse adviseCall(ChatClientRequest chatClientRequest, CallAdvisorChain chain) {
+        chatClientRequest = before(chatClientRequest);
+        ChatClientResponse chatClientResponse = chain.nextCall(chatClientRequest);
+        observeAfter(chatClientResponse);
+        return chatClientResponse;
+    }
+
+    @Override
+    public Flux<ChatClientResponse> adviseStream(ChatClientRequest chatClientRequest, StreamAdvisorChain chain) {
+        chatClientRequest = before(chatClientRequest);
+        Flux<ChatClientResponse> chatClientResponseFlux = chain.nextStream(chatClientRequest);
+        return (new ChatClientMessageAggregator()).aggregateChatClientResponse(chatClientResponseFlux, this::observeAfter);
     }
 }

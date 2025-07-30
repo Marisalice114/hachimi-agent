@@ -20,6 +20,7 @@ import java.util.List;
 
 import static org.springframework.ai.vectorstore.pgvector.PgVectorStore.PgDistanceType.COSINE_DISTANCE;
 import static org.springframework.ai.vectorstore.pgvector.PgVectorStore.PgIndexType.HNSW;
+import static org.springframework.ai.vectorstore.pgvector.PgVectorStore.PgIndexType.IVFFLAT;
 
 @Configuration
 @Slf4j
@@ -41,7 +42,7 @@ public class PGVectorVectorConfig {
         log.info("🚀 使用的EmbeddingModel类型: {}", embeddingModel.getClass().getName());
         PgVectorStore pgVectorStore = PgVectorStore.builder(vectorJdbcTemplate, embeddingModel)
                 .distanceType(COSINE_DISTANCE)
-                .indexType(HNSW)
+                .indexType(HNSW) //HNSW 或 IVFFLAT
                 .initializeSchema(true)
                 .schemaName("public")
                 .vectorTableName("vector_store")
