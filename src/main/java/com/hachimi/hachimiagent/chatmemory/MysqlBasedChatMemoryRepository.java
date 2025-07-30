@@ -139,23 +139,14 @@ public class MysqlBasedChatMemoryRepository implements ChatMemoryRepository {
      * 只有在真正需要时才进行数据库操作
      */
     private void performIntelligentSave(String conversationId, List<Message> messages) {
-        // 获取当前数据库中的消息
-        List<ChatMessage> existingMessages = messageMapper.findByConversationIdOrderByOrder(conversationId);
+        // ✅ 简化版本 - 因为指纹已经验证过内容不同，直接更新即可
+        log.info("确认需要更新数据库: conversationId={}", conversationId);
 
-        // 详细比较消息内容
-        boolean needsUpdate = isUpdateRequired(messages, existingMessages);
+        // 删除现有消息（逻辑删除）
+        deleteExistingMessages(conversationId);
 
-        if (needsUpdate) {
-            log.info("确认需要更新数据库: conversationId={}", conversationId);
-
-            // 删除现有消息（逻辑删除）
-            deleteExistingMessages(conversationId);
-
-            // 保存新消息
-            saveMessages(conversationId, messages);
-        } else {
-            log.info("数据库内容已是最新，跳过更新: conversationId={}", conversationId);
-        }
+        // 保存新消息
+        saveMessages(conversationId, messages);
     }
 
     /**

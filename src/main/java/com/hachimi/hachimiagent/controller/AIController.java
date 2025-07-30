@@ -120,6 +120,37 @@ public class AIController {
         }
     }
 
+    @GetMapping(value = "/manus/chat/sse/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public SseEmitter doChatWithManusStream(@RequestParam String message) {
+        try {
+            return aiStreamingService.startManusStream(message);
+        } catch (IllegalArgumentException e) {
+            // 对于SSE，我们需要通过emitter发送错误，而不是返回错误响应
+            SseEmitter errorEmitter = new SseEmitter(1000L);
+            try {
+                errorEmitter.send(SseEmitter.event()
+                        .name("error")
+                        .data("参数错误: " + e.getMessage()));
+                errorEmitter.completeWithError(e);
+            } catch (IOException ioException) {
+                log.error("发送错误事件失败", ioException);
+            }
+            return errorEmitter;
+        } catch (Exception e) {
+            log.error("启动Manus SSE流失败", e);
+            SseEmitter errorEmitter = new SseEmitter(1000L);
+            try {
+                errorEmitter.send(SseEmitter.event()
+                        .name("error")
+                        .data("启动Manus聊天失败: " + e.getMessage()));
+                errorEmitter.completeWithError(e);
+            } catch (IOException ioException) {
+                log.error("发送错误事件失败", ioException);
+            }
+            return errorEmitter;
+        }
+    }
+
     // ================================
     // 中断控制接口
     // ================================

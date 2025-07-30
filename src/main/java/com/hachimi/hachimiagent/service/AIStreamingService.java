@@ -2,10 +2,13 @@ package com.hachimi.hachimiagent.service;
 
 import com.hachimi.hachimiagent.agent.HachimiManus;
 import com.hachimi.hachimiagent.agent.Prompt.ManusPrompt;
+import com.hachimi.hachimiagent.agent.model.AgentState;
 import com.hachimi.hachimiagent.app.LoveApp;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.model.ChatModel;
+import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -131,24 +134,62 @@ public class AIStreamingService {
                 // 创建Manus实例
                 HachimiManus hachimiManus = new HachimiManus(allTools, dashscopeChatModel, manusPrompt);
 
-                // 这里需要修改HachimiManus的runStream方法支持中断
-                // 或者使用类似的流式处理逻辑
-                // 暂时使用简单的文本响应演示
+                // 【关键修改】设置SSE发送器用于思考过程可视化
+                hachimiManus.setSseEmitter(emitter);
 
-                String response = "Manus处理: " + message + " (这里需要集成实际的Manus流式调用)";
+                hachimiManus.setNextStepPrompt(message);
 
-                // 模拟流式输出
-                for (int i = 0; i < response.length() && streamingManager.shouldContinue(streamId); i += 5) {
-                    if (!streamingManager.shouldContinue(streamId)) break;
+                int stepCount = 0;
 
-                    String chunk = response.substring(i, Math.min(i + 5, response.length()));
-                    emitter.send(SseEmitter.event().name("data").data(chunk));
+                // 执行Agent循环
+                while (hachimiManus.getState() != AgentState.FINISHED &&
+                        stepCount < hachimiManus.getMaxSteps() &&
+                        streamingManager.shouldContinue(streamId)) {
 
-                    Thread.sleep(100); // 模拟处理时间
+                    stepCount++;
+
+                    // 【修改】移除手动发送思考信号，由think方法内部发送
+                    // emitter.send("THINK:正在分析问题: " + message);
+
+                    // 执行think阶段（think方法内部会自动发送THINK:消息）
+                    boolean needsAction = hachimiManus.think();
+
+                    ChatResponse response = hachimiManus.getToolCallChatResponse();
+
+                    if (needsAction && response != null && response.getResult().getOutput().getToolCalls() != null) {
+                        // 有工具调用
+                        for (AssistantMessage.ToolCall toolCall : response.getResult().getOutput().getToolCalls()) {
+
+                            // 发送工具开始信号
+                            emitter.send("TOOL_START:" + toolCall.name());
+
+                            // 发送工具参数
+                            emitter.send("TOOL_ARGS:" + toolCall.arguments());
+
+                            // 执行工具（act方法内部会自动发送思考过程）
+                            String result = hachimiManus.act();
+
+                            // 发送工具结果
+                            emitter.send("TOOL_RESULT:" + result);
+                        }
+                    } else {
+                        // 没有工具调用，获取AI的文本回复作为最终回复
+                        if (response != null && response.getResult().getOutput().getText() != null) {
+                            String textResponse = response.getResult().getOutput().getText();
+                            if (!textResponse.trim().isEmpty()) {
+                                emitter.send("FINAL_RESPONSE:" + textResponse);
+                            }
+                        }
+                        break;
+                    }
+
+                    Thread.sleep(100);
                 }
 
+                // 如果循环结束但没有发送最终回复，发送默认完成消息
                 if (streamingManager.shouldContinue(streamId)) {
-                    emitter.send(SseEmitter.event().name("complete").data("Manus处理完成"));
+                    emitter.send("FINAL_RESPONSE:任务处理完成");
+                    emitter.send("[DONE]");
                     emitter.complete();
                 }
 

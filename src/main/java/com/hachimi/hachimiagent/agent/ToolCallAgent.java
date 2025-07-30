@@ -19,7 +19,9 @@ import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.model.tool.ToolCallingManager;
 import org.springframework.ai.model.tool.ToolExecutionResult;
 import org.springframework.ai.tool.ToolCallback;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -28,10 +30,14 @@ import java.util.stream.Collectors;
 @Slf4j
 public class ToolCallAgent extends ReactAgent{
 
+    // 新增：SSE发送器，用于发送思考过程
+    private SseEmitter sseEmitter;
+
     //可用工具list
     private final ToolCallback[] avaliableToollist;
     //对话回复，方便提取信息
     private ChatResponse toolCallChatResponse;
+
     //工具调用管理
     private final ToolCallingManager toolCallingManager;
     //对话选项，配置工具调用相关选项
@@ -52,6 +58,9 @@ public class ToolCallAgent extends ReactAgent{
      */
     @Override
     public boolean think() {
+        // 发送思考开始信号
+        sendThinkingProcess("开始分析用户问题...");
+
         //1.判断输入内容
         if(getNextStepPrompt()!=null && !getNextStepPrompt().isEmpty()){
             UserMessage userMessage = new UserMessage(getNextStepPrompt());
@@ -59,11 +68,15 @@ public class ToolCallAgent extends ReactAgent{
             getMessagesList().add(userMessage);
             // 清空nextStepPrompt，避免重复添加
             setNextStepPrompt(null);
+
+            sendThinkingProcess("已接收用户输入: " + userMessage.getText());
         }
+
         List<Message> messageList = getMessagesList();
         //对话设置需要再prompt中指定
         Prompt prompt = new Prompt(messageList,chatOptions);
 
+        sendThinkingProcess("正在调用AI模型进行推理...");
 
         //2.工具调用
         try {
@@ -83,24 +96,36 @@ public class ToolCallAgent extends ReactAgent{
             //输出信息和选择使用的工具的info
             log.info(getName() + " - ToolCallAgent think result: " + result);
             log.info(getName() + " - ToolCallAgent think nums of tool calls to use: " + toolCallList.size());
+
+            // 发送AI推理结果的思考过程
+            if (result != null && !result.trim().isEmpty()) {
+                sendThinkingProcess("AI推理结果: " + result);
+            }
+
             //返回工具调用信息 名称和参数
             String toolCallInfo = toolCallList.stream()
                     .map(toolCall -> "Tool: " + toolCall.name() + ", Arguments: " + toolCall.arguments())
                     .reduce((a, b) -> a + "\n" + b)
                     .orElse("No tools called");
             log.info(toolCallInfo);
+
             if (toolCallList.isEmpty()){
                 // 不需要调用工具
-                // 参照为继续对话
+                sendThinkingProcess("AI决定直接回复，无需使用工具");
                 messageList.add(assistantMessage);
                 return false;
             }else {
                 // 需要调用工具
-                // 自动记录
+                sendThinkingProcess("AI决定使用 " + toolCallList.size() + " 个工具来处理问题");
+                // 发送具体工具信息
+                for (AssistantMessage.ToolCall toolCall : toolCallList) {
+                    sendThinkingProcess("准备调用工具: " + toolCall.name() + " 参数: " + toolCall.arguments());
+                }
                 return true;
             }
         } catch (Exception e) {
             log.error(getName() + " - ToolCallAgent think failed: " + e.getMessage(), e);
+            sendThinkingProcess("思考过程中出现错误: " + e.getMessage());
             getMessagesList().add(new AssistantMessage("Error during tool call: " + e.getMessage()));
             return false;
         }
@@ -114,8 +139,12 @@ public class ToolCallAgent extends ReactAgent{
     @Override
     public String act() {
         if (!toolCallChatResponse.hasToolCalls()){
+            sendThinkingProcess("没有找到工具调用，跳过执行阶段");
             return "Tool calls not found in chat response, no action taken.";
         }
+
+        sendThinkingProcess("开始执行工具调用...");
+
         //调用会话记录
         Prompt prompt = new Prompt(getMessagesList(), chatOptions);
         ToolExecutionResult toolExecutionResult = toolCallingManager.executeToolCalls(prompt, toolCallChatResponse);
@@ -125,19 +154,39 @@ public class ToolCallAgent extends ReactAgent{
         //conversationHistory是整个会话记录，只需要取最后一条
         //ToolResponseMessage继承自 Message
         ToolResponseMessage toolResponseMessage = (ToolResponseMessage) CollUtil.getLast(toolExecutionResult.conversationHistory());
+
         //判断是否用了终止调用工具
         boolean isTerminateToolUsed = toolResponseMessage.getResponses().stream()
                 //判断调用的工具名
                 .anyMatch(response -> response.name().equals("doTerminate"));
         if(isTerminateToolUsed){
             setState(AgentState.FINISHED);
+            sendThinkingProcess("检测到终止工具调用，任务即将完成");
         }
 
         String result = toolResponseMessage.getResponses().stream()
-                .map(response -> "Tool: " + response.name() + ", Result: " + response.responseData())
+                .map(response -> response.responseData().toString()) // 直接使用responseData
                 .collect(Collectors.joining("\n"));
+
+        // 发送工具执行结果的思考过程
+        sendThinkingProcess("工具执行完成，结果: " + (result.length() > 100 ? result.substring(0, 100) + "..." : result));
+
         log.info(result);
         return result;
+    }
+
+
+    /**
+     * 发送思考过程到前端
+     */
+    private void sendThinkingProcess(String content) {
+        if (sseEmitter != null) {
+            try {
+                sseEmitter.send("THINK:" + content);
+            } catch (IOException e) {
+                log.error("发送思考过程失败: {}", e.getMessage());
+            }
+        }
     }
 }
 

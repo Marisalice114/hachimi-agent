@@ -11,6 +11,19 @@ spring:
     username: ${MYSQL_USERNAME}
     password: ${MYSQL_PASSWORD}
     type: com.alibaba.druid.pool.DruidDataSource
+    # --- 关键：加入 Druid 连接池详细配置 ---
+    initial-size: 5
+    min-idle: 5
+    max-active: 20
+    max-wait: 60000
+    time-between-eviction-runs-millis: 30000 # 建议缩短
+    min-evictable-idle-time-millis: 300000
+    validation-query: SELECT 1 # 关键：设置验证查询
+    test-while-idle: true      # 关键：空闲时检查
+    test-on-borrow: true       # *重要补充*：借出时检查 (强烈推荐)
+    test-on-return: false
+    pool-prepared-statements: true
+    max-pool-prepared-statement-per-connection-size: 20
 
     # PostgreSQL 向量数据源 - 保持云数据库连接
     vector:
@@ -27,7 +40,7 @@ spring:
       embedding:
         enabled: true
         options:
-          model: netease-youdao/bce-embedding-base_v1
+          model: Qwen/Qwen3-Embedding-0.6B
     dashscope:
       api-key: ${ALI_API_KEY}
       base-url: ${DASH_SCOPE_BASE_URL:https://dashscope.aliyuncs.com/compatible-mode/v1}

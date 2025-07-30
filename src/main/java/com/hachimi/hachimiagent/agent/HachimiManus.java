@@ -2,10 +2,16 @@ package com.hachimi.hachimiagent.agent;
 
 import com.hachimi.hachimiagent.advisor.SelfLogAdvisor;
 import com.hachimi.hachimiagent.agent.Prompt.ManusPrompt;
+import com.hachimi.hachimiagent.agent.model.AgentState;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.model.ChatModel;
+import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.stereotype.Component;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 
 //springboot启动的时候自动注入chatclient 所以这里也让其作为component
@@ -30,6 +36,14 @@ public class HachimiManus extends ToolCallAgent {
                 .defaultAdvisors(new SelfLogAdvisor())
                 .build();
         this.setChatClient(chatClient);
-
     }
+
+    /**
+     * 设置SSE发送器用于思考过程可视化
+     */
+    @Override
+    public void setSseEmitter(SseEmitter emitter) {
+        super.setSseEmitter(emitter);
+    }
+
 }

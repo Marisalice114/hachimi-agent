@@ -9,19 +9,6 @@ spring:
     url: jdbc:mysql://localhost:3306/hachimi_agent?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: root
-    # Druid 连接池配置
-    initial-size: 5
-    min-idle: 5
-    max-active: 20
-    max-wait: 60000
-    time-between-eviction-runs-millis: 60000
-    min-evictable-idle-time-millis: 300000
-    validation-query: SELECT 1
-    test-while-idle: true
-    test-on-borrow: false
-    test-on-return: false
-    pool-prepared-statements: true
-    max-pool-prepared-statement-per-connection-size: 20
 
     # 向量数据源 - PostgreSQL (RAG知识库)
     vector:
@@ -36,7 +23,7 @@ spring:
       chat:
         model: qwen3:0.6b
       embedding:
-        enbaled: false
+        enabled: false
 
 
     vectorstore:
@@ -68,8 +55,9 @@ spring:
 # MyBatis-Plus 配置
 mybatis-plus:
   configuration:
+    cache-enabled: true
+    local-cache-scope: statement
     map-underscore-to-camel-case: true
-    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
   global-config:
     db-config:
       logic-delete-field: deleted
@@ -80,18 +68,28 @@ mybatis-plus:
   # 指定实体类包路径
   type-aliases-package: com.hachimi.hachimiagent.entity
 
-# 日志配置
-#logging:
-#  level:
-#    com.hachimi.hachimiagent: INFO
-#    com.hachimi.hachimiagent.mapper: INFO
-#    org.springframework.ai: INFO
-#    com.hachimi.hachimiagent.rag.TranslationQueryTransformer: DEBUG
 logging:
   level:
-    org.springframework.ai: DEBUG
-    org.springframework.ai.openai: DEBUG
-    org.springframework.web.client: DEBUG
+    # 完全关闭MyBatis相关日志
+    org.apache.ibatis: OFF
+    org.mybatis: OFF
+    com.baomidou.mybatisplus: WARN
+
+    # 关闭Spring JDBC和事务日志
+    org.springframework.jdbc: WARN
+    org.springframework.transaction: WARN
+
+    # 关闭数据库连接池详细日志
+    com.alibaba.druid: WARN
+    com.zaxxer.hikari: WARN
+
+    # Spring框架日志
+    org.springframework: INFO
+    org.springframework.boot: INFO
+    com.hachimi.hachimiagent: INFO
+    com.hachimi.hachimiagent.mapper: INFO
+    org.springframework.ai: INFO
+
 
 server:
   port: 8123
@@ -115,7 +113,8 @@ springdoc:
     - group: 'default'
       paths-to-match: '/**'
       packages-to-scan: com.hachimi.hachimiagent.controller
-# knife4j的增强配置，不需要增强可以不配
+
+# knife4j的增强配置
 knife4j:
   enable: false
   setting:
