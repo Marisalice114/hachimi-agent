@@ -41,7 +41,7 @@ spring:
 
     vectorstore:
       pgvector:
-        index-type: IVFFlat                # 向量索引类型
+        index-type: HNSW                   # 向量索引类型
         distance-type: COSINE_DISTANCE     # 距离计算方式
         max-document-batch-size: 10000     # 批处理大小
     mcp:
