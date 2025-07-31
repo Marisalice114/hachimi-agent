@@ -43,11 +43,12 @@ public class LoveAppMarkdownReader {
                 String filenameWithoutExtension = filename.substring(0, filename.lastIndexOf('.'));
                 // 提取倒数第二个和第三个字作为状态
                 String status = "";
-                if (filenameWithoutExtension.length() >= 3) {
-                    status = filenameWithoutExtension.substring(
-                            filenameWithoutExtension.length() - 3,
-                            filenameWithoutExtension.length() - 1
-                    );
+                int dashIndex = filenameWithoutExtension.indexOf(" - ");
+                if (dashIndex != -1 && dashIndex < filenameWithoutExtension.length() - 3) {
+                    String afterDash = filenameWithoutExtension.substring(dashIndex + 3); // +3 是因为" - "长度为3
+                    if (afterDash.length() > 1) {
+                        status = afterDash.substring(0, afterDash.length() - 1); // 去掉最后一个字符
+                    }
                 }
                 MarkdownDocumentReaderConfig config = MarkdownDocumentReaderConfig.builder()
                         .withHorizontalRuleCreateDocument(true)

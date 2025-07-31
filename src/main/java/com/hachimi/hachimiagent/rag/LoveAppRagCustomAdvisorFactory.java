@@ -41,7 +41,7 @@ public class LoveAppRagCustomAdvisorFactory {
 
         DocumentRetriever retriever = VectorStoreDocumentRetriever.builder()
                 .vectorStore(vectorStore)
-//                .similarityThreshold(0.3)
+                .similarityThreshold(0.5)
                 .topK(3)
                 .filterExpression(filterStatus)
                 .build();

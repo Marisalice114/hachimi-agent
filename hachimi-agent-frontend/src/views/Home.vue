@@ -48,7 +48,7 @@
         </p>
         
         <p class="hero-description">
-          集成先进AI技术，提供专业恋爱咨询与智能任务处理服务。
+          集成先进AI技术，提供专业写作指导与智能任务处理服务。
           <br>让AI成为您生活和工作的最佳伙伴。
         </p>
         
@@ -162,17 +162,17 @@
         <h2 class="section-title">选择您的AI助手</h2>
         
         <div class="app-grid">
-          <router-link to="/love-app" class="app-card love-card" aria-label="进入AI恋爱大师应用">
+          <router-link to="/love-app" class="app-card love-card" aria-label="进入AI写作助手应用">
             <div class="card-icon">
-              💕
+              ✍️
             </div>
             <div class="card-content">
-              <h3 class="app-card-title">AI 恋爱大师</h3>
+              <h3 class="app-card-title">AI 写作助手</h3>
               <p class="app-card-description">
-                专业的恋爱咨询和情感建议，基于心理学理论，为您提供个性化的情感指导方案
+                专业的写作指导和创作建议，基于文学理论，为您提供个性化的写作指导方案
               </p>
               <div class="card-features">
-                <span class="feature-tag">情感分析</span>
+                <span class="feature-tag">创作指导</span>
                 <span class="feature-tag">个性化建议</span>
                 <span class="feature-tag">24/7咨询</span>
               </div>
@@ -240,7 +240,7 @@
           <div class="footer-links">
             <div class="link-group">
               <h4>产品</h4>
-              <a href="/love-app">AI恋爱大师</a>
+              <a href="/love-app">AI写作助手</a>
               <a href="/manus-app">AI超级智能体</a>
             </div>
             <div class="link-group">
@@ -293,19 +293,19 @@ const hasUsedDemo = ref(false) // 新增：标记是否已使用过演示
 // 快速回复建议
 const quickReplies = [
   "你好，能介绍一下自己吗？",
-  "如何使用恋爱大师功能？", 
+  "如何使用写作助手功能？", 
   "AI超级智能体可以做什么？",
   "你能帮我分析一下问题吗？"
 ]
 
 // 预设回复库
 const aiResponses = {
-  "你好": "你好！我是Hachimi AI助手，很高兴为您服务！我可以帮您处理各种问题，包括恋爱咨询、任务分析等。",
-  "介绍": "我是Hachimi AI助手，集成了先进的人工智能技术。我有两个主要功能：恋爱大师和AI超级智能体。恋爱大师可以提供情感咨询，AI超级智能体可以帮您分析和处理复杂任务。",
-  "恋爱": "恋爱大师功能可以帮您：\\n• 分析感情问题\\n• 提供约会建议\\n• 改善沟通技巧\\n• 解决情感困惑\\n\\n点击恋爱大师卡片即可开始使用！",
+  "你好": "你好！我是Hachimi AI助手，很高兴为您服务！我可以帮您处理各种问题，包括写作指导、任务分析等。",
+  "介绍": "我是Hachimi AI助手，集成了先进的人工智能技术。我有两个主要功能：写作助手和AI超级智能体。写作助手可以提供专业的写作指导，AI超级智能体可以帮您分析和处理复杂任务。",
+  "写作": "写作助手功能可以帮您：\\n• 创意写作指导\\n• 文学创作建议\\n• 提升写作技巧\\n• 解决写作困惑\\n\\n点击写作助手卡片即可开始使用！",
   "智能体": "AI超级智能体具有强大的分析能力：\\n• 分步骤分析复杂问题\\n• 提供详细解决方案\\n• 多维度思考问题\\n• 个性化建议\\n\\n点击AI超级智能体开始体验！",
-  "功能": "我的主要功能包括：\\n🎯 恋爱咨询：提供专业的情感建议\\n🧠 智能分析：分步骤解决复杂问题\\n💬 对话交互：自然流畅的交流体验\\n📱 跨平台：支持各种设备使用",
-  "帮助": "当然可以！我很乐意帮助您。请告诉我您遇到的具体问题，我会根据问题类型为您提供最合适的解决方案。您可以选择使用恋爱大师或AI超级智能体功能。"
+  "功能": "我的主要功能包括：\\n✍️ 写作指导：提供专业的创作建议\\n🧠 智能分析：分步骤解决复杂问题\\n💬 对话交互：自然流畅的交流体验\\n📱 跨平台：支持各种设备使用",
+  "帮助": "当然可以！我很乐意帮助您。请告诉我您遇到的具体问题，我会根据问题类型为您提供最合适的解决方案。您可以选择使用写作助手或AI超级智能体功能。"
 }
 
 // 生成粒子样式
@@ -474,11 +474,11 @@ const updateMetaTags = () => {
     meta.content = content
   }
   
-  updateMetaTag('description', 'Hachimi Agent是专业的AI智能助手平台，提供AI恋爱大师和AI超级智能体服务，帮助用户解决恋爱问题和处理各种智能任务')
-  updateMetaTag('keywords', 'AI助手,人工智能,聊天机器人,AI恋爱大师,智能体,恋爱咨询,智能任务处理')
+  updateMetaTag('description', 'Hachimi Agent是专业的AI智能助手平台，提供AI写作助手和AI超级智能体服务，帮助用户解决写作问题和处理各种智能任务')
+  updateMetaTag('keywords', 'AI助手,人工智能,聊天机器人,AI写作助手,智能体,写作指导,智能任务处理')
   
   updateMetaProperty('og:title', 'Hachimi Agent - 智能AI助手平台')
-  updateMetaProperty('og:description', '专业的AI助手平台，提供恋爱咨询和智能任务处理服务')
+  updateMetaProperty('og:description', '专业的AI助手平台，提供写作指导和智能任务处理服务')
   updateMetaProperty('og:url', window.location.href)
 }
 

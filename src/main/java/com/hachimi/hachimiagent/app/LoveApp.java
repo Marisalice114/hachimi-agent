@@ -1,5 +1,6 @@
 package com.hachimi.hachimiagent.app;
 
+import com.hachimi.hachimiagent.advisor.BanWordAdvisor;
 import com.hachimi.hachimiagent.advisor.SelfLogAdvisor;
 import com.hachimi.hachimiagent.chatmemory.MysqlBasedChatMemoryRepository;
 import com.hachimi.hachimiagent.rag.QueryTransformer;
@@ -25,7 +26,6 @@ import reactor.core.publisher.Flux;
 
 import java.util.List;
 
-import static com.hachimi.hachimiagent.rag.LoveAppRagCustomAdvisorFactory.createLoveAppRagCustomAdvisor;
 
 @Component
 @Slf4j
@@ -38,12 +38,16 @@ public class LoveApp {
     private final ChatMemory dbChatMemory;
     private final SelfLogAdvisor selfLogAdvisor;
     private final ChatMemory baseChatMemory;
+    private final BanWordAdvisor banWordAdvisor;
     private final QueryTransformer queryTransformer;
 
-    private static final String SYSTEM_PROMPT = "扮演深耕恋爱心理领域的专家。开场向用户表明身份，告知用户可倾诉恋爱难题。" +
-            "围绕单身、恋爱、已婚三种状态提问：单身状态询问社交圈拓展及追求心仪对象的困扰；" +
-            "恋爱状态询问沟通、习惯差异引发的矛盾；已婚状态询问家庭责任与亲属关系处理的问题。" +
-            "引导用户详述事情经过、对方反应及自身想法，以便给出专属解决方案。";
+    private static final String SYSTEM_PROMPT = "扮演资深写作导师和文学创作专家，拥有丰富的写作指导经验。开场向用户表明身份，告知用户可分享写作困惑和创作难题。" +
+            "根据用户写作目标进行针对性提问：" +
+            "【创意写作类】针对小说、散文、诗歌等文学创作，询问题材选择、人物塑造、情节构思、文笔风格等方面的困扰；" +
+            "【实用写作类】针对论文、报告、商务文案、自媒体内容等应用写作，询问结构组织、逻辑表达、受众定位、效果达成等问题；" +
+            "【技能提升类】针对写作基础薄弱者，询问语言表达、素材积累、写作习惯、灵感获取等基础能力提升需求。" +
+            "深入了解用户的写作背景、目标读者、创作动机、遇到的具体障碍，以及已尝试的解决方法，" +
+            "结合用户提供的作品片段或创作计划，给出个性化的写作指导建议和实操方案。";
 
     /**
      * 使用构造函数注入所有依赖。
@@ -65,6 +69,7 @@ public class LoveApp {
                 .build();
         this.queryTransformer = queryTransformer;
         this.selfLogAdvisor = new SelfLogAdvisor();
+        this.banWordAdvisor = new BanWordAdvisor();
 
         InMemoryChatMemoryRepository chatMemoryRepository = new InMemoryChatMemoryRepository();
         this.baseChatMemory = MessageWindowChatMemory.builder()
@@ -91,6 +96,7 @@ public class LoveApp {
                         //基于自建工厂的rag
 //                        createLoveAppRagCustomAdvisor(pgVectorVectorStore, "单身"),
                         MessageChatMemoryAdvisor.builder(dbChatMemory).build(),
+                        banWordAdvisor,
                         selfLogAdvisor
                 ).build();
 
@@ -257,6 +263,7 @@ public class LoveApp {
 
     public Flux<String> doChatByStream(String userMessage, String chatId) {
         // 调用chatClient进行对话，使用官方文档推荐的方式传递对话ID
+
         return ragChatClient.prompt()
                 .user(userMessage)
                 .advisors(a -> a.param(ChatMemory.CONVERSATION_ID, chatId))

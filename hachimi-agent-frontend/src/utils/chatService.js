@@ -220,7 +220,7 @@ export const aiChatService = {
     return this.getSseBaseUrl()
   },
 
-  // 启动可中断的恋爱大师聊天 - 返回SSE URL
+  // 启动写作助手聊天 - 返回SSE URL (后端接口路径保持为love_app，但功能已改为写作助手)
   getLoveAppSseUrl(message, chatId) {
     const baseUrl = this.getSseBaseUrl()
     

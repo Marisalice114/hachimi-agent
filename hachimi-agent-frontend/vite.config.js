@@ -37,17 +37,25 @@ export default defineConfig({
     port: 3000,
     proxy: {
       '/api': {
-        target: 'https://hachimi-agent-test-176198-5-1371623266.sh.run.tcloudbase.com',
+        target: 'https://hachimi-write-back-176198-5-1371623266.sh.run.tcloudbase.com', // 使用您的后端公网地址
         changeOrigin: true,
-        secure: true,
+        secure: true, // HTTPS后端需要设置为true
         // 移除 rewrite，保持原始路径
         ws: true, // 启用WebSocket代理（对SSE也有帮助）
         // 添加超时配置
-        timeout: 60000,
-        // 代理日志（生产环境已注释）
-        // configure: (proxy, options) => {
-        //   proxy.on('error', (err, req, res) => {
-        //     console.log('proxy error', err);
+        timeout: 120000, // 增加到120秒，适应AI生成时间
+        // 代理日志（开发环境可以启用）
+        configure: (proxy, options) => {
+          proxy.on('error', (err, req, res) => {
+            console.log('🔴 代理错误:', err.message);
+          });
+          proxy.on('proxyReq', (proxyReq, req, res) => {
+            console.log('📤 代理请求:', req.method, req.url, '-> https://hachimi-write-back-176198-5-1371623266.sh.run.tcloudbase.com' + req.url);
+          });
+          proxy.on('proxyRes', (proxyRes, req, res) => {
+            console.log('📥 代理响应:', proxyRes.statusCode, req.url);
+          });
+        }
         //   });
         //   proxy.on('proxyReq', (proxyReq, req, res) => {
         //     console.log('Sending Request to the Target:', req.method, req.url);
@@ -65,7 +73,7 @@ export default defineConfig({
     port: 3000,
     proxy: {
       '/api': {
-        target: 'https://hachimi-agent-test-176198-5-1371623266.sh.run.tcloudbase.com',
+        target: 'https://hachimi-write-back-176198-5-1371623266.sh.run.tcloudbase.com',
         changeOrigin: true,
         secure: true,
         ws: true, // 启用WebSocket代理

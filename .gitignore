@@ -1,80 +1,185 @@
-# ==========================================
-# 敏感信息和环境配置
-# ==========================================
-.env
-.env.local
-.env.production
-.env.staging
+# ===========================================
+# Java/Maven 相关
+# ===========================================
 
-# ==========================================
-# IDE 和编辑器
-# ==========================================
+# 编译输出目录
+target/
+*.jar
+*.war
+*.ear
+*.class
+
+# Maven 包装器可执行文件（保留脚本）
+!.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+# ===========================================
+# IDE 相关文件
+# ===========================================
+
+# IntelliJ IDEA
 .idea/
-.vscode/
 *.iml
 *.ipr
 *.iws
+out/
+
+# Eclipse
 .project
 .classpath
 .settings/
+bin/
 
-# ==========================================
-# Maven 构建产物
-# ==========================================
-target/
-*/target/
-.mvn/wrapper/maven-wrapper.jar
+# VS Code
+.vscode/
 
-# ==========================================
-# 日志文件
-# ==========================================
+# NetBeans
+nbproject/
+nbbuild/
+dist/
+nbdist/
+
+# ===========================================
+# 操作系统相关
+# ===========================================
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+
+# Linux
+*~
+
+# ===========================================
+# 敏感配置文件（包含API密钥等）
+# ===========================================
+
+# 本地开发配置文件
+src/main/resources/application-local.yml
+src/main/resources/application-dev.yml
+
+# 环境变量文件
+.env
+.env.local
+.env.development
+.env.production
+
+# 备份文件夹（可能包含敏感信息）
+backup/
+wechat-deploy/
+
+# ===========================================
+# 前端相关（Node.js/Vue）
+# ===========================================
+
+# 依赖目录
+node_modules/
+hachimi-agent-frontend/node_modules/
+
+# 构建输出
+hachimi-agent-frontend/dist/
+hachimi-agent-frontend/build/
+
+# 前端环境配置
+hachimi-agent-frontend/.env
+hachimi-agent-frontend/.env.local
+hachimi-agent-frontend/.env.wechat
+hachimi-agent-frontend/.env.development
+hachimi-agent-frontend/.env.production
+
+# 前端日志和缓存
+hachimi-agent-frontend/npm-debug.log*
+hachimi-agent-frontend/yarn-debug.log*
+hachimi-agent-frontend/yarn-error.log*
+hachimi-agent-frontend/.cache/
+
+# 前端压缩包
+hachimi-agent-frontend/*.zip
+
+# ===========================================
+# MCP 服务器相关
+# ===========================================
+
+# MCP 服务器编译输出
+hachimi-image-search-mcp-server/target/
+
+# ===========================================
+# 临时文件和日志
+# ===========================================
+
+# 应用日志
 *.log
 logs/
-log/
 
-# ==========================================
-# 临时文件和缓存
-# ==========================================
+# 临时文件目录
 tmp/
 temp/
 *.tmp
 *.temp
-.cache/
 
-# ==========================================
-# 操作系统文件
-# ==========================================
-.DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
-Thumbs.db
+# 系统临时文件
+*.swp
+*.swo
+*~
 
-# ==========================================
+# ===========================================
 # Docker 相关
-# ==========================================
-.docker/
-docker-data/
+# ===========================================
 
-# ==========================================
-# 备份文件
-# ==========================================
-backup/
-*.bak
-*.backup
+# Docker 覆盖配置文件
+docker-compose.override.yml
 
-# ==========================================
+# ===========================================
+# 部署和分发相关
+# ===========================================
+
+# 部署包
+*.zip
+wechat-deploy.zip
+
+# 部署脚本可能包含的敏感信息
+deploy-*.bat
+deploy-*.sh
+
+# ===========================================
+# 其他敏感或不需要的文件
+# ===========================================
+
+# 安全相关
+*.key
+*.pem
+*.p12
+*.jks
+secrets.yml
+credentials.yml
+
+# 测试和调试
+test-results/
+coverage/
+*.pid
+
 # 数据库文件
-# ==========================================
 *.db
 *.sqlite
 *.sqlite3
 
-# ==========================================
-# 其他敏感文件
-# ==========================================
-secrets.txt
-config.properties
-src/main/resources/application-local.yml
+# 文档草稿
+*.draft
+HELP.md
+
+# 配置文件备份
+*.bak
+*.orig
+
+# 编辑器临时文件
+.vimrc
+.vim/

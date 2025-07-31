@@ -77,13 +77,13 @@
             <div class="message-avatar">
               {{ message.messageType === 'user' ? 'U' : 'AI' }}
             </div>
-            <div class="message-content">{{ message.content }}</div>
+            <div class="message-content" v-html="parseMarkdown(message.content)"></div>
           </div>
           
           <!-- 正在输入的AI回复 -->
           <div v-if="isTyping" class="message ai">
             <div class="message-avatar">AI</div>
-            <div class="message-content">{{ currentAiMessage }}</div>
+            <div class="message-content" v-html="parseMarkdown(currentAiMessage)"></div>
           </div>
         </div>
  
@@ -95,7 +95,7 @@
               v-if="isLoading && currentStreamId"
               @click="stopChatStream"
               class="stop-button"
-              title="停止AI回复"
+              title="停止写作指导"
             >
               ⏹
             </button>
@@ -104,7 +104,7 @@
               v-model="inputMessage"
               @keyup.enter="handleKeyUp"
               :disabled="isLoading"
-              placeholder="输入您的消息..."
+              placeholder="请描述您的写作问题或分享您的创作困惑..."
               class="chat-input"
               rows="1"
               ref="inputTextarea"
@@ -127,9 +127,10 @@
 
 <script>
 import { chatHistoryService, generateChatId, aiChatService } from '@/utils/chatService'
+import { marked } from 'marked'
 
 export default {
-  name: 'LoveApp',
+  name: 'WritingApp',
   data() {
     return {
       currentChatId: null,
@@ -149,6 +150,25 @@ export default {
   },
   
   async mounted() {
+    // 配置marked选项
+    marked.setOptions({
+      breaks: true, // 支持换行
+      gfm: true, // 支持GitHub风格Markdown
+      sanitize: false, // 允许HTML（注意：生产环境可能需要sanitize）
+      headerIds: false, // 禁用标题ID生成
+      mangle: false, // 禁用邮箱地址混淆
+      // 启用链接解析
+      renderer: new marked.Renderer()
+    })
+    
+    // 自定义链接渲染器，确保链接在新窗口打开
+    const renderer = new marked.Renderer()
+    renderer.link = function(href, title, text) {
+      const titleAttr = title ? ` title="${title}"` : ''
+      return `<a href="${href}"${titleAttr} target="_blank" rel="noopener noreferrer">${text}</a>`
+    }
+    marked.setOptions({ renderer })
+    
     this.updateMetaTags()
     await this.loadSessions()
     this.createNewChat()
@@ -159,12 +179,23 @@ export default {
   },
   
   methods: {
+    // Markdown解析方法
+    parseMarkdown(content) {
+      if (!content) return ''
+      try {
+        return marked(content)
+      } catch (error) {
+        console.error('Markdown解析错误:', error)
+        return content // 如果解析失败，返回原文本
+      }
+    },
+    
     updateMetaTags() {
-      document.title = 'AI恋爱大师 - Hachimi Agent'
-      this.updateMetaTag('description', 'AI恋爱大师提供专业的恋爱咨询和情感建议，帮助您解决恋爱中的各种问题，获得个性化的情感指导')
-      this.updateMetaTag('keywords', 'AI恋爱大师,恋爱咨询,情感建议,恋爱指导,情感AI,恋爱问题')
-      this.updateMetaProperty('og:title', 'AI恋爱大师 - 专业恋爱咨询服务')
-      this.updateMetaProperty('og:description', '获得AI恋爱大师的专业情感建议，解决您的恋爱困惑')
+      document.title = 'AI写作助手 - Hachimi Agent'
+      this.updateMetaTag('description', 'AI写作助手提供专业的写作指导和创作建议，帮助您解决写作中的各种问题，获得个性化的写作指导')
+      this.updateMetaTag('keywords', 'AI写作助手,写作指导,创作建议,文学创作,写作培训,文案写作,小说写作,散文写作')
+      this.updateMetaProperty('og:title', 'AI写作助手 - 专业写作指导服务')
+      this.updateMetaProperty('og:description', '获得AI写作助手的专业创作建议，解决您的写作困惑')
     },
     
     updateMetaTag(name, content) {
@@ -200,7 +231,7 @@ export default {
     async loadSessions() {
       try {
         this.sessions = await chatHistoryService.getAllSessions()
-        console.log('LoveApp 加载的会话数量:', this.sessions.length)
+        console.log('写作助手 加载的会话数量:', this.sessions.length)
       } catch (error) {
         console.error('加载会话列表失败:', error)
         this.sessions = []
@@ -423,23 +454,23 @@ export default {
       
       this.eventSource.addEventListener('error', (event) => {
         console.error('收到error事件:', event.data)
-        this.handleSseError(event.data || 'AI处理失败')
+        this.handleSseError(event.data || '写作指导处理失败')
       })
     },
     
     async stopChatStream() {
       if (!this.currentStreamId) {
-        console.warn('没有活动的聊天流可以停止')
+        console.warn('没有活动的写作指导流可以停止')
         return
       }
       
       try {
         await aiChatService.stopChatStream(this.currentStreamId)
-        console.log('成功停止AI聊天流:', this.currentStreamId)
+        console.log('成功停止写作指导流:', this.currentStreamId)
         this.handleSseComplete()
       } catch (error) {
-        console.error('停止AI聊天流失败:', error)
-        this.handleSseError('停止AI回复失败: ' + (error.message || '未知错误'))
+        console.error('停止写作指导流失败:', error)
+        this.handleSseError('停止写作指导失败: ' + (error.message || '未知错误'))
       }
     },
     
@@ -460,7 +491,7 @@ export default {
         } else {
           this.handleSseError('数据接收超时')
         }
-      }, 10000)
+      }, 60000) // 增加到60秒，适应AI生成时间
     },
     
     clearSseTimeout() {
@@ -471,12 +502,12 @@ export default {
     },
     
     handleSseError(errorMessage) {
-      console.log('处理SSE错误，当前AI消息长度:', this.currentAiMessage.length)
+      console.log('处理SSE错误，当前写作指导消息长度:', this.currentAiMessage.length)
       
       const hasAiContent = this.currentAiMessage && this.currentAiMessage.trim().length > 0
       
       if (hasAiContent) {
-        console.log('检测到AI回复内容，保存并显示')
+        console.log('检测到写作指导内容，保存并显示')
         this.messages.push({
           id: Date.now(),
           content: this.currentAiMessage.trim(),
@@ -499,7 +530,7 @@ export default {
           timestamp: new Date()
         })
       } else if (hasAiContent) {
-        console.log('已保存AI回复，不显示错误消息')
+        console.log('已保存写作指导，不显示错误消息')
         setTimeout(() => {
           this.loadSessions()
         }, 1000)
@@ -509,7 +540,7 @@ export default {
     },
     
     handleSseComplete() {
-      console.log('处理SSE完成，当前AI消息长度:', this.currentAiMessage.length)
+      console.log('处理SSE完成，当前写作指导消息长度:', this.currentAiMessage.length)
       
       this.clearSseTimeout()
       
@@ -520,9 +551,9 @@ export default {
           messageType: 'ai',
           timestamp: new Date()
         })
-        console.log('AI消息已添加到消息列表')
+        console.log('写作指导消息已添加到消息列表')
       } else {
-        console.warn('没有AI消息内容，可能是连接异常结束')
+        console.warn('没有写作指导内容，可能是连接异常结束')
       }
       
       this.isLoading = false
@@ -1098,6 +1129,106 @@ export default {
   line-height: 1.6;
   white-space: pre-wrap;
   font-size: 15px;
+}
+
+/* Markdown样式 */
+.message-content h1,
+.message-content h2,
+.message-content h3,
+.message-content h4,
+.message-content h5,
+.message-content h6 {
+  margin: 16px 0 8px 0;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.message-content h1 { font-size: 1.5em; }
+.message-content h2 { font-size: 1.3em; }
+.message-content h3 { font-size: 1.2em; }
+.message-content h4 { font-size: 1.1em; }
+
+.message-content p {
+  margin: 8px 0;
+  line-height: 1.6;
+}
+
+.message-content strong {
+  font-weight: 600;
+  color: #1e40af;
+}
+
+.message-content em {
+  font-style: italic;
+  color: #6b7280;
+}
+
+/* 链接样式 */
+.message-content a {
+  color: #3b82f6;
+  text-decoration: underline;
+  transition: all 0.2s ease;
+}
+
+.message-content a:hover {
+  color: #1d4ed8;
+  text-decoration-thickness: 2px;
+}
+
+.message-content a:visited {
+  color: #7c3aed;
+}
+
+.message-content ul,
+.message-content ol {
+  margin: 12px 0;
+  padding-left: 24px;
+}
+
+.message-content li {
+  margin: 4px 0;
+  line-height: 1.5;
+}
+
+.message-content blockquote {
+  margin: 16px 0;
+  padding: 12px 16px;
+  border-left: 4px solid #3b82f6;
+  background: rgba(59, 130, 246, 0.05);
+  border-radius: 0 6px 6px 0;
+}
+
+.message-content code {
+  background: rgba(100, 116, 139, 0.1);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+  font-size: 0.9em;
+  color: #e11d48;
+}
+
+.message-content pre {
+  background: #1f2937;
+  color: #f9fafb;
+  padding: 16px;
+  border-radius: 8px;
+  overflow-x: auto;
+  margin: 12px 0;
+  border: 1px solid #374151;
+}
+
+.message-content pre code {
+  background: none;
+  padding: 0;
+  color: inherit;
+  font-size: 0.9em;
+}
+
+.message-content hr {
+  margin: 20px 0;
+  border: none;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #e5e7eb, transparent);
 }
 
 .chat-messages {
