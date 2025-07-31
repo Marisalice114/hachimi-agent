@@ -1,1 +1,0 @@
-我的项目中配置了两份yml,一份是application.yml,一份是application-local.yml.在local中我将一些密码以及apikey进行了保存,防止push的时候泄漏.
