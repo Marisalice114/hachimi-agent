@@ -819,7 +819,7 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #2563eb;
   border: none;
   color: white;
   border-radius: 50%;
@@ -829,7 +829,7 @@ export default {
 }
 
 .send-button:hover {
-  background: linear-gradient(135deg, #5a67d8 0%, #6b4991 100%);
+  background: #1d4ed8;
   transform: scale(1.05);
 }
 
@@ -1053,7 +1053,7 @@ export default {
 }
 
 .message.user {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #2563eb;
   color: white;
   margin-left: auto;
   flex-direction: row-reverse;
@@ -1082,7 +1082,7 @@ export default {
 }
 
 .message.user .message-avatar {
-  background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+  background: #1d4ed8;
   color: white;
   margin-left: 12px;
 }

@@ -1,0 +1,84 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0c0c0c;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#1a1a2e;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#16213e;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="textGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#667eea;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#764ba2;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="iconGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00d2ff;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#3a7bd5;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- 背景 -->
+  <rect width="1200" height="630" fill="url(#bgGrad)"/>
+  
+  <!-- 装饰性粒子 -->
+  <circle cx="100" cy="100" r="3" fill="#667eea" opacity="0.6"/>
+  <circle cx="1100" cy="150" r="4" fill="#764ba2" opacity="0.5"/>
+  <circle cx="200" cy="500" r="2" fill="#00d2ff" opacity="0.7"/>
+  <circle cx="1000" cy="450" r="3" fill="#3a7bd5" opacity="0.6"/>
+  <circle cx="950" cy="200" r="2" fill="#ff6b6b" opacity="0.5"/>
+  
+  <!-- 主要图标 -->
+  <g transform="translate(150, 200)">
+    <!-- 大圆背景 -->
+    <circle cx="115" cy="115" r="100" fill="url(#iconGrad)" opacity="0.9"/>
+    
+    <!-- AI神经网络图案 -->
+    <g transform="translate(65, 65)">
+      <!-- 中心节点 -->
+      <circle cx="50" cy="50" r="15" fill="#ffffff"/>
+      
+      <!-- 外围节点 -->
+      <circle cx="20" cy="20" r="8" fill="#ffffff" opacity="0.9"/>
+      <circle cx="80" cy="20" r="8" fill="#ffffff" opacity="0.9"/>
+      <circle cx="20" cy="80" r="8" fill="#ffffff" opacity="0.9"/>
+      <circle cx="80" cy="80" r="8" fill="#ffffff" opacity="0.9"/>
+      
+      <!-- 连接线 -->
+      <line x1="20" y1="20" x2="50" y2="50" stroke="#ffffff" stroke-width="3" opacity="0.7"/>
+      <line x1="80" y1="20" x2="50" y2="50" stroke="#ffffff" stroke-width="3" opacity="0.7"/>
+      <line x1="20" y1="80" x2="50" y2="50" stroke="#ffffff" stroke-width="3" opacity="0.7"/>
+      <line x1="80" y1="80" x2="50" y2="50" stroke="#ffffff" stroke-width="3" opacity="0.7"/>
+    </g>
+    
+    <!-- 心形装饰 -->
+    <path d="M180 80c0-15 15-25 25-25s25 10 25 25c0 15-25 35-25 35s-25-20-25-35z" fill="#ff6b6b" opacity="0.8"/>
+  </g>
+  
+  <!-- 主标题 -->
+  <text x="450" y="250" font-family="Arial, sans-serif" font-size="72" font-weight="bold" fill="url(#textGrad)">
+    Hachimi Agent
+  </text>
+  
+  <!-- 副标题 -->
+  <text x="450" y="320" font-family="Arial, sans-serif" font-size="36" fill="#ffffff" opacity="0.9">
+    智能AI助手平台
+  </text>
+  
+  <!-- 功能描述 -->
+  <text x="450" y="380" font-family="Arial, sans-serif" font-size="28" fill="#d1d5db">
+    🤖 AI恋爱大师  ⚡ 超级智能体
+  </text>
+  
+  <text x="450" y="420" font-family="Arial, sans-serif" font-size="24" fill="#9ca3af">
+    专业的情感咨询与智能任务处理服务
+  </text>
+  
+  <!-- 底部装饰线 -->
+  <rect x="450" y="460" width="200" height="3" fill="url(#textGrad)" opacity="0.8"/>
+  
+  <!-- 小型装饰元素 -->
+  <g transform="translate(450, 500)">
+    <circle cx="0" cy="0" r="20" fill="url(#iconGrad)" opacity="0.3"/>
+    <circle cx="50" cy="10" r="15" fill="#667eea" opacity="0.4"/>
+    <circle cx="100" cy="5" r="18" fill="#764ba2" opacity="0.3"/>
+    <circle cx="150" cy="8" r="12" fill="#ff6b6b" opacity="0.4"/>
+  </g>
+</svg>

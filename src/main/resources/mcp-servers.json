@@ -1,7 +1,7 @@
 {
   "mcpServers": {
     "baidu-map": {
-      "command": "npx.cmd",
+      "command": "npx",
       "args": [
         "-y",
         "@baidumap/mcp-server-baidu-map"

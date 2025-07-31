@@ -1,0 +1,15 @@
+# 环境变量文件
+.env.local
+.env.*.local
+
+# 构建输出
+dist/
+node_modules/
+
+# IDE
+.vscode/
+.idea/
+
+# 系统文件
+.DS_Store
+Thumbs.db
