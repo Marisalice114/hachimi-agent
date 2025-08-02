@@ -1,4 +1,4 @@
-# Hachimi-Agent: 智能写作导师AI Agent框架
+# Hachimi-Agent: 智能写作导师/AI Agent框架
 
 ![image-20250731153420104](D:\ideaproject\hachimi-agent\assets\image-20250731153420104.png)
 
