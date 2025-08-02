@@ -1,10 +1,10 @@
-# AgentCraft: 智能写作导师/AI Agent框架
+# HachimiAgent: 智能写作导师/AI Agent框架
 
 ![image-20250731153420104](./assets/image-20250731153420104.png)
 
 ## 🚀 项目简介
 
-AgentCraft 是一个专业的AI写作导师系统，同时也是一个可扩展的AI Agent应用开发框架。项目基于 Spring Boot 3 + Spring AI 和 Vue 3 构建，以写作指导为核心应用场景，展示了如何构建专业化的AI Agent系统。
+HachimiAgent 是一个专业的AI写作导师系统，同时也是一个可扩展的AI Agent应用开发框架。项目基于 Spring Boot 3 + Spring AI 和 Vue 3 构建，以写作指导为核心应用场景，展示了如何构建专业化的AI Agent系统。
 
 该框架具有高度的可定制性，用户可以通过自定义RAG知识库和修改提示词来适配不同的应用场景。当前以写作导师为示例场景，为用户提供专业的创意写作、实用写作和写作技能提升指导。
 
