@@ -4,11 +4,8 @@ spring:
   profiles:
     active: local
   datasource:
-    # MySQL 数据库配置
-    # url: jdbc:mysql://localhost:3306/hachimi_agent?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
-    # driver-class-name: com.mysql.cj.jdbc.Driver
     # PGSQL 数据库配置
-    url: jdbc:postgresql://rm-cn-w5g4cx7e400027ao.rwlb.rds.aliyuncs.com:5432/hachimi_agent
+    url: 
     driver-class-name: org.postgresql.Driver
     # Druid 连接池配置
     druid:
