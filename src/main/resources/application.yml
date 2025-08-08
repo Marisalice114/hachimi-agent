@@ -6,13 +6,13 @@ spring:
 
   # 主数据源 - MySQL (保持原有配置路径，对话存储)
   datasource:
-    url: jdbc:mysql://localhost:3306/hachimi_agent?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+    url: 
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: root
 
     # 向量数据源 - PostgreSQL (RAG知识库)
     vector:
-      url: jdbc:postgresql://pgm-bp1e8qd11rjy5uq9bo.rwlb.rds.aliyuncs.com:5432/hachimi_agent
+      url: 
       driver-class-name: org.postgresql.Driver
   ai:
     dashscope:
