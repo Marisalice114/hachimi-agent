@@ -27,7 +27,7 @@ public class LoveAppRagCloudeAdvisorConfig {
         DashScopeApi dashScopeApi = DashScopeApi.builder()
                 .apiKey(dashscopeApiKey)
                 .build();
-        final String KNOWLEDGE_BASE_ID = "恋爱大师";
+        final String KNOWLEDGE_BASE_ID = "写作大师";
 
         DocumentRetriever retriver = new DashScopeDocumentRetriever(dashScopeApi,
                 new DashScopeDocumentRetrieverOptions().builder()
