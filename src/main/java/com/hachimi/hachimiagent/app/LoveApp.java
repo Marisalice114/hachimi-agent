@@ -142,7 +142,7 @@ public class LoveApp {
     public LoveReport doChatWithReport(String userMessage, String chatId) {
         // 调用chatClient进行对话，使用官方文档推荐的方式传递对话ID
         LoveReport loveReport = normalChatClient.prompt()
-                .system(SYSTEM_PROMPT + "每次对话后都要生成恋爱结果，标题为{用户名}的恋爱报告，内容为建议列表")
+                .system(SYSTEM_PROMPT + "每次对话后都要生成写作结果，标题为{用户名}的写作报告，内容为建议列表")
                 .user(userMessage)
                 .advisors(a -> a.param(ChatMemory.CONVERSATION_ID, chatId))
                 .call()
