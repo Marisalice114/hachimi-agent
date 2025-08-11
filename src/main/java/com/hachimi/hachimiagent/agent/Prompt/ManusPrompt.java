@@ -25,6 +25,17 @@ public class ManusPrompt {
             If you want to stop the interaction at any point, use the `terminate` tool/function call.
             """;
 
+    private String stuckPrompt = """
+        
+        IMPORTANT: I notice you might be repeating the same response. Please try a different approach:
+        1. Consider using different tools or methods
+        2. Break down the problem differently  
+        3. Provide alternative solutions
+        4. If you cannot proceed further, use the `terminate` tool to end the interaction
+        
+        Avoid repeating your previous responses and try a fresh perspective.
+        """;
+
     /**
      * 构建系统提示词
      */
