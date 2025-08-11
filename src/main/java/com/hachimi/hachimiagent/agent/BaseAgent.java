@@ -223,16 +223,43 @@ public abstract class BaseAgent {
     }
 
 
-    private boolean isAssistantMessage(Message message) {
-        // 需要根据你的Message类的实际结构来实现
-        // 可能是：
-        // return "assistant".equals(message.getRole());
-        // 或者：
-        // return message instanceof AssistantMessage;
-
-        // 临时实现，你需要根据实际情况调整
-        return true; // 或者具体的判断逻辑
+  private boolean isAssistantMessage(Message message) {
+    if (message == null) {
+      return false;
     }
+
+    // 方法1: 使用Spring AI的MessageType枚举判断（首选）
+    try {
+      var messageType = message.getMessageType();
+      if (messageType != null) {
+        return "ASSISTANT".equals(messageType.name());
+      }
+    } catch (Exception e) {
+      // 兼容性处理，继续尝试其他方法
+      log.debug("Failed to get message type via getMessageType(): {}", e.getMessage());
+    }
+
+    // 方法2: 使用instanceof判断（备用方案）
+    try {
+      // 检查是否为AssistantMessage类型
+      String className = message.getClass().getSimpleName();
+      if ("AssistantMessage".equals(className)) {
+        return true;
+      }
+
+      // 也可以使用反射检查包名（更精确）
+      String fullClassName = message.getClass().getName();
+      if (fullClassName.contains("AssistantMessage")) {
+        return true;
+      }
+    } catch (Exception e) {
+      log.debug("Failed to check message type via class name: {}", e.getMessage());
+    }
+
+    // 默认返回false（只有确认是助手消息才返回true）
+    return false;
+  }
+
     /**
      * 防止循环
      */
